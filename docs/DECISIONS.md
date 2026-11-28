@@ -1,5 +1,39 @@
 # Decisions
 
+## D-188: Separate selective capture-control mapping and UART data buffering
+
+- **Date:**2026-11-28. D18746061527240 at41638e9e passes native/reset/
+  full management reload, but worst setup/hold remain exactly-34.141884/
+  -1.226009ns. Root verifies archive,37/6/20prepared input hashes,
+  55/55/64simulation inputs, three8736-bit observations and four timing
+  script/case/execution/coverage audits. Zero loops/policy differences;
+  all13304active pins annotated. The twelve changed spare inputs do not
+  resolve the measured worst paths. Receipt:
+  reports/r1_capture_spare_native_timing_46061527240.json. Not adopted.
+- Test only the eight SPI receive FFs' enable/reset logic locally, instead
+  of the global MIN_CTRL16 change that failed routing. For LUTFF_ESR,
+  compute Dnew = E ? (R ? 0 : D) : Q in a LUT4; retain the same FF class
+  with E=1/R=0, clock/output/attributes unchanged. Keeping the class also
+  preserves its initialization semantics. Exhaustively check16binary
+  transitions including E=0/R=1 hold priority. Pin the vendor ESR module
+  checksum from the original Yosys library. This is a binary primitive
+  transition argument, not a whole-design formal/timing claim.
+- Separately insert four identity LUTs on UART RX before sync[0], retaining
+  that FF's primitive/clock/set/output and pinning it to measured X6Y1/C.
+  The final LUT may pack into the FF's existing LC; actual extra cells,
+  routeability and minimum/maximum delay must be measured. No RTL delays,
+  timing exceptions, new clock cycles or private-state initialization.
+- Read-only searches found no longer same-terminal UART route with one
+  mux change, nor with the bounded two-mux/exclusive-consumer policy.
+  This does not prove no detour exists. Do not select the immediate
+  alternate input: it carries a different external signal.
+- Both compiler variants use original MIN_CTRL4, seed1/clock D, same
+  source/proofs/pins/resource/50MHz request; reproduce original rawc6first.
+  Reject mixed variants and unsupported FF/control/vendor semantics;
+  record separate source/derived/proof hashes. Both actual-source staging
+  checks,100focused guards and workflow lint pass. Any fitting image needs
+  fresh native/reset/reload and original RC; no prior selector repair reuse.
+
 ## D-187: Park twelve physical spare inputs on the qualified capture image
 
 - **Date:**2026-11-27. D186compile46047728814 at4009f0bb reproduces

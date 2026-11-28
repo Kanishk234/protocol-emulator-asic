@@ -22,6 +22,13 @@ inventory. The original MIN_CTRL4 compiler control reproduced exactly. This
 fixed experiment is rejected; a smaller cell count did not make it routable.
 See `r1_local_enable_compile_46047728814.json`.
 
+November 28 update: D18746061527240 at41638e9e passes native/reset/full
+management reload and qualified RC measurement, but both worst slacks are
+unchanged. The spare-input changes do not fix the current worst paths. Two
+separate D188compiles now target selective eight-FF capture-control mapping
+and a four-LUT UART input delay chain at the existing capture site. Their
+binary netlist checks pass; fit and physical delay remain unmeasured.
+
 Each experiment keeps the original 20 ns period, 0.25 ns uncertainty, real
 configuration loading, active annotation and both loop policies. Source-only
 proofs, compiler frequency estimates and successful workflow execution cannot

@@ -1,0 +1,125 @@
+{
+  "run": 46061527240,
+  "source_sha": "41638e9e83d1f5e23815289feafab738d4823457",
+  "artifact_id": 15228948716,
+  "archive_sha256": "191930e28ff44547496184ed4dc36602db14e4d803ff30e05e236df81f6cfc0c",
+  "archive_verified": true,
+  "prepared_input_hashes_checked": {
+    "sa_functional/plan.json": 37,
+    "r1_loop_timing/plan.json": 6,
+    "r1_loop_timing/baseline/plan.json": 20
+  },
+  "native_cases": {
+    "control": {
+      "strict_tests": 1,
+      "input_hashes_checked": 55,
+      "configuration_bits_checked": 8736,
+      "image_sha256": "9af858413aa8c39739f3f7bda8e290433d58cb1702f69a04c9c6e74657b90410",
+      "snapshot_sha256": "0491a427285f53b27db8166c875d76536fe237c4e619277be297d8791ed94ba7",
+      "management_reload_tested": false,
+      "user_restart_probe_tested": true
+    },
+    "candidate": {
+      "strict_tests": 1,
+      "input_hashes_checked": 55,
+      "configuration_bits_checked": 8736,
+      "image_sha256": "6ad9f95e7c415548b52ce739d88281b688b1ccdcbc85ed67047e3255049ea87f",
+      "snapshot_sha256": "49d625b3e80832460da997a4765dd2c1ffe91df21b0a200e0d4dbbf5272ebf8a",
+      "management_reload_tested": false,
+      "user_restart_probe_tested": true
+    },
+    "shell": {
+      "strict_tests": 1,
+      "input_hashes_checked": 64,
+      "configuration_bits_checked": 8736,
+      "image_sha256": "6ad9f95e7c415548b52ce739d88281b688b1ccdcbc85ed67047e3255049ea87f",
+      "snapshot_sha256": "49d625b3e80832460da997a4765dd2c1ffe91df21b0a200e0d4dbbf5272ebf8a",
+      "management_reload_tested": true,
+      "user_restart_probe_tested": false
+    }
+  },
+  "all_native_and_management_reload_passed": true,
+  "original_connected_failure_reproduced": true,
+  "four_timing_script_case_execution_coverage_audits_passed": true,
+  "timing_result": {
+    "run": "46061527240",
+    "source_sha": "41638e9e83d1f5e23815289feafab738d4823457",
+    "diagnostic_complete": true,
+    "models": {
+      "setup": {
+        "edge_registers": 370,
+        "inactive_unobservable": 134,
+        "clocked_timed": 222,
+        "clocked_constant_data": 14,
+        "endpoints": 242,
+        "worst_slack_ns": -34.141884,
+        "worst_endpoint": "Tile_X2Y1_LUT4x8_ha/_1730_/D",
+        "structural_loops": 0,
+        "loop_policy_sensitive": false,
+        "loop_policy_differences": [],
+        "structural_loops_by_policy": {
+          "static": 0,
+          "dynamic": 0
+        }
+      },
+      "hold": {
+        "edge_registers": 370,
+        "inactive_unobservable": 134,
+        "clocked_timed": 222,
+        "clocked_constant_data": 14,
+        "endpoints": 242,
+        "worst_slack_ns": -1.226009,
+        "worst_endpoint": "Tile_X6Y1_LUT4x8_ha/_1731_/D",
+        "structural_loops": 0,
+        "loop_policy_sensitive": false,
+        "loop_policy_differences": [],
+        "structural_loops_by_policy": {
+          "static": 0,
+          "dynamic": 0
+        }
+      }
+    },
+    "coverage": {
+      "routed_setup_static": {
+        "active_pins": 13304,
+        "fully_missing_drivers": 35,
+        "partially_missing_loads": 0,
+        "active_missing_drivers": [],
+        "passed": true
+      },
+      "routed_setup_dynamic": {
+        "active_pins": 13304,
+        "fully_missing_drivers": 35,
+        "partially_missing_loads": 0,
+        "active_missing_drivers": [],
+        "passed": true
+      },
+      "routed_hold_static": {
+        "active_pins": 13304,
+        "fully_missing_drivers": 35,
+        "partially_missing_loads": 0,
+        "active_missing_drivers": [],
+        "passed": true
+      },
+      "routed_hold_dynamic": {
+        "active_pins": 13304,
+        "fully_missing_drivers": 35,
+        "partially_missing_loads": 0,
+        "active_missing_drivers": [],
+        "passed": true
+      }
+    },
+    "model_qualified": true,
+    "necessary_macro_constraints_met": false,
+    "actual_native_run": "46061527240",
+    "actually_loaded_image_sha256": "6ad9f95e7c415548b52ce739d88281b688b1ccdcbc85ed67047e3255049ea87f",
+    "timing_acceptance": false,
+    "physical_acceptance": false,
+    "adopted": false,
+    "scope": "Actually loaded placement image on unchanged source-proven connected nominal RC, original 20ns/0.25ns/conditional zero-I/O boundary. Original failing parent retained. No full-chip/PVT/loading-mode acceptance."
+  },
+  "worst_slacks_unchanged_from_parent": true,
+  "timing_acceptance": false,
+  "physical_acceptance": false,
+  "adopted": false
+}

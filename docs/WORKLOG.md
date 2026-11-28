@@ -2,6 +2,29 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-11-28 — Selective setup mapping and UART hold-buffer experiments
+
+- D18746061527240 at41638e9e passes native/reset/full management reload;
+  qualified worst slacks remain-34.141884/-1.226009ns, zero loops and
+  full13304-pin active annotation. Root authenticates archive, all3strict
+  XMLs/8736-bit observations,55/55/64simulation inputs,37/6/20plan inputs
+  and all4timing scripts/cases/executions/coverage, including original
+  failing RC control. Receipt:
+  reports/r1_capture_spare_native_timing_46061527240.json. No adoption.
+- Same-terminal UART searches find no longer route under the single-mux
+  or bounded two-mux/exclusive-consumer policy; immediate alternate input
+  is a different signal and rejected. No hold-delay claim from hop counts.
+- D188stages two separate compile variants: local LUT data functions for
+  the eight receive FFs (same ESR primitive/clock/output,16binary transition
+  checks/vendor ABI checksum), and four identity LUTs before UART sync[0]
+  with its FF held atX6Y1/C. Both retain MIN_CTRL4/source/clock D/seed1/
+  physical resource/pins; original rawc6control first. Actual JSON transforms
+  and fresh proof/resource preparation pass;100focused tests/lint pass.
+- **Boxes ticked:** none. Timing still fails; G1 stays selected.
+- **Next:** hosted compile both variants, inspect route/packing and exact
+  transform provenance, then fresh native/reset/management reload/RC for
+  any fitting candidate. Keep rejected controls and timing conditions.
+
 ## 2026-11-27 — Physical spare-input timing and hold investigation
 
 - D18646047728814 at4009f0bb hits600s with60routing arcs remaining;

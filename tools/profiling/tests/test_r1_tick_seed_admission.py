@@ -7,7 +7,26 @@ import pytest
 
 ROOT=Path(__file__).resolve().parents[3]
 sys.path.insert(0,str(ROOT/'spikes/r1'))
-from sa_functional import prepare,admit_capture_identity
+from sa_functional import prepare,admit_capture_identity,admit_buffer_identity
+
+
+@pytest.mark.parametrize('mutation',['candidate_marker','marker_type','control_marker','min_ctrl','other_variant','proof','chain','site'])
+def test_uart_buffer_identity_cannot_reuse_other_variant_or_site(mutation):
+    row=json.loads((ROOT/'spikes/r1/uart_buffer_compile_sources.json').read_text())['seeds']['1']
+    cases={'control':dict(uart_buffer=False,local_capture=False,min_ctrl=4,buffer_transform=None),
+           'candidate':dict(uart_buffer=True,local_capture=False,min_ctrl=4,buffer_transform=deepcopy(row['buffer_transform']))}
+    admit_buffer_identity(cases,row)
+    if mutation=='candidate_marker':cases['candidate']['uart_buffer']=False
+    elif mutation=='marker_type':cases['candidate']['uart_buffer']=1
+    elif mutation=='control_marker':cases['control']['uart_buffer']=True
+    elif mutation=='min_ctrl':cases['candidate']['min_ctrl']=16
+    elif mutation=='other_variant':cases['candidate']['local_capture']=True
+    elif mutation=='proof':cases['candidate']['buffer_transform']['proof_sha256']='0'*64
+    elif mutation=='chain':row['input_transform']['original_json_sha256']='0'*64
+    elif mutation=='site':
+        row['buffer_transform']['required_capture_bel']='X1Y1/A'
+        cases['candidate']['buffer_transform']=deepcopy(row['buffer_transform'])
+    with pytest.raises(ValueError,match='UART buffer'):admit_buffer_identity(cases,row)
 
 
 @pytest.mark.parametrize('mutation',['candidate_marker','marker_type','control_marker','min_ctrl','other_variant','proof','chain'])

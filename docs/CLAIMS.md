@@ -277,3 +277,14 @@ filters. Its first-overrun result matched the independent fabric for
 checked that every ready urgent slot with a next-EVAL selection
 guarantee fired on the eligible clock at both cadences. These results
 cover the stated graph forms and supplied traffic/service schedules.
+
+Mixed-tag pipeline fuzz ran 10,000 compiled programs at each cadence.
+One to four disjoint urgent slots per lane use reversed priority order
+across the two hops. All 30,005 tokens per cadence matched in tag,
+payload and ordering. Every eligible ready slot fired and each slot's
+observed count matched its tag traffic.
+
+The pin TX fabric head proof also holds with independent static tag
+filters on the four blocking HOST_IN receivers. ABC PDR passed the
+unbounded stability property for each port, and bounded covers reached
+an accepted held token at each port with filtering enabled.

@@ -14,14 +14,15 @@ import time
 ROOT=Path(__file__).resolve().parents[1]
 SOURCE_FILES=['src/trw_chan_prod.v','src/trw_chan_port.v','src/trw_fabric.v','src/trw_assert.vh',
               'formal/props/channel_composition.sv','formal/channel.sby']
-TASKS=['blocking','ready','taps','blocking_cover','tap_cover']
+PROOF_TASKS=['blocking','blocking_tx','ready','taps']
+TASKS=PROOF_TASKS+['blocking_cover','blocking_tx_cover','tap_cover']
 
 
 def sha(path):return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
 def run(config,cwd,task,out,expect,engine=None):
-    engine = engine or ('abc pdr' if task in ['blocking','ready','taps'] else 'smtbmc z3')
+    engine = engine or ('abc pdr' if task in PROOF_TASKS else 'smtbmc z3')
     log=out.with_suffix('.log');out.parent.mkdir(parents=True,exist_ok=True)
     begin=time.monotonic()
     with log.open('w') as stream:

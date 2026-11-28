@@ -1,8 +1,10 @@
 [tasks]
 blocking proof
+blocking_tx proof
 ready proof
 taps proof
 blocking_cover cover
+blocking_tx_cover cover
 tap_cover cover
 
 [options]
@@ -17,7 +19,11 @@ cover: smtbmc z3
 [script]
 read -formal -sv -I. trw_chan_prod.v trw_chan_port.v trw_fabric.v channel_composition.sv
 ready: chparam -set ALWAYS_READY 1 channel_blocking
+blocking_tx: chparam -set BLOCK_TX 1 channel_blocking
+blocking_tx_cover: chparam -set BLOCK_TX 1 channel_blocking
 blocking: prep -top channel_blocking -flatten
+blocking_tx: prep -top channel_blocking -flatten
+blocking_tx_cover: prep -top channel_blocking -flatten
 ready: prep -top channel_blocking -flatten
 taps: prep -top channel_taps -flatten
 blocking_cover: prep -top channel_blocking -flatten

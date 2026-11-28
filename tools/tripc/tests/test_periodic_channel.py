@@ -284,3 +284,83 @@ def test_filtered_schedule_against_fabric():
 def test_invalid_arrival_tags(tags):
     with pytest.raises(ValueError, match='Arrival tags'):
         analyze_periodic_channel(2, 3, arrival_tags=tags)
+
+
+def test_multicast_declared_service_matches_fabric():
+    from itertools import product
+    from math import lcm
+
+    from tripsim.fabric import Fabric
+
+    image, _ = tripc.compile_text("""program multicast
+connect L0.I0 <- HOST_IN accept=DATA
+connect L1.I0 <- HOST_IN accept=EVENT
+connect L0.I1 <- HOST_IN tap
+""")
+    services = [(period, phase) for period in range(1, 5) for phase in range(period)]
+    tags = [0, 2]
+    for (arrivals, offset), first, second in product(services, repeat=3):
+        consumers = {
+            port: dict(service_period=period, service_phase=phase)
+            for port, (period, phase) in zip(('L0.I0', 'L1.I0'), (first, second))
+        }
+        result = analyze_compiled_channel(image, dict(
+            consumers=consumers, arrival_period=arrivals, arrival_phase=offset, arrival_tags=tags,
+        ))
+        fabric = Fabric()
+        producer = fabric.producer('HOST_IN')
+        for port, source, mode, accept in image['connect']:
+            fabric.port(port)
+            fabric.connect(port, source, mode, accept)
+        assert result['status'] in ('overrun', 'no_overrun')
+        expected = result.get('clock')
+        stop = expected + 1 if expected is not None else (
+            max(row['clocks_checked'] for row in result['consumers'].values())
+            + lcm(arrivals * len(tags), first[0], second[0])
+        )
+        observed = None
+        for clock in range(stop):
+            if clock % arrivals == offset:
+                if not producer.free():
+                    observed = clock
+                    break
+                producer.load(tags[clock // arrivals % len(tags)], clock)
+            for port, config in consumers.items():
+                sink = fabric.ports[port]
+                if clock % config['service_period'] == config['service_phase'] and sink.avail():
+                    sink.take()
+            fabric.commit()
+        assert observed == expected, (arrivals, offset, consumers, result)
+
+
+def test_multicast_requires_service_for_entire_blocking_set():
+    image, _ = tripc.compile_text("""program incomplete
+connect L0.I0 <- HOST_IN
+connect L1.I0 <- HOST_IN
+""")
+    with pytest.raises(ValueError, match='all blocking consumers'):
+        analyze_compiled_channel(image, {
+            'consumers': {'L0.I0': {'service_period': 3}},
+            'arrival_period': 3,
+        })
+
+
+def test_multicast_cli_reports_first_overrun(tmp_path, monkeypatch, capsys):
+    import json
+    import sys
+
+    from tripc.__main__ import main
+
+    source = tmp_path / 'multicast.trw'
+    source.write_text('program multicast\nconnect L0.I0 <- HOST_IN\nconnect L1.I0 <- HOST_IN\n')
+    schedule = tmp_path / 'schedule.json'
+    schedule.write_text(json.dumps({
+        'arrival_period': 3,
+        'consumers': {'L0.I0': {'service_period': 3, 'service_phase': 1},
+                      'L1.I0': {'service_period': 3}},
+    }))
+    monkeypatch.setattr(sys, 'argv', ['tripc', str(source), '--channel-schedule', str(schedule)])
+    assert main() == 2
+    result = json.loads(capsys.readouterr().out.split('```json\n')[-1].split('```')[0])['result']
+    assert result['producer'] == 'HOST_IN'
+    assert (result['status'], result['clock']) == ('overrun', 3)

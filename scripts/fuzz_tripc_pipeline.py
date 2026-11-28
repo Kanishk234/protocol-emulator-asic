@@ -45,7 +45,18 @@ def check(index, rng):
         for word in data:
             chip.host_push(word, tag)
         # Fixed observation window for these two hops and the serviced host.
-        chip.run_for(12 * len(data) + 4)
+        for _ in range(12 * len(data) + 4):
+            due = []
+            if chip.cycle % period == 0:
+                for lane in chip.lanes:
+                    if lane.running and lane._ready(lane.slots[0]):
+                        due.append((lane, lane.stats['fired'][0]))
+            clock = chip.cycle
+            chip.step()
+            for lane, before in due:
+                if lane.stats['fired'][0] != before + 1:
+                    raise AssertionError(f'{index}, fire_period={period}, clock={clock}: '
+                                         f'eligible urgent slot missed EVAL\n{source}')
         observed = list(chip.host_out)
         fired = [lane.stats['fired'][0] for lane in chip.lanes]
         if observed != expected or fired != [len(data), len(data)]:

@@ -101,7 +101,9 @@ def analyze_periodic_pipeline(arrival_period, service_period, *,
 
 
 def analyze_compiled_channel(image, schedule):
-    """Check a declared schedule on a compiled point-to-point binding."""
+    """Check declared service for all blocking subscribers of a producer."""
+    if isinstance(schedule, dict) and 'consumers' in schedule:
+        return _analyze_compiled_multicast(image, schedule)
     required = {'consumer', 'arrival_period', 'service_period'}
     optional = {'arrival_phase', 'service_phase', 'arrival_tags'}
     if not isinstance(schedule, dict) or not required <= schedule.keys() <= required | optional:
@@ -112,6 +114,44 @@ def analyze_compiled_channel(image, schedule):
         raise ValueError('Expected an unfiltered blocking consumer or explicit arrival_tags')
     args = {key: value for key, value in schedule.items() if key != 'consumer'}
     return {'producer': producer, 'consumer': consumer, **analyze_periodic_channel(accept=accept, **args)}
+
+
+def _analyze_compiled_multicast(image, schedule):
+    required = {'consumers', 'arrival_period'}
+    optional = {'arrival_phase', 'arrival_tags'}
+    if not required <= schedule.keys() <= required | optional:
+        raise ValueError('Expected consumers, arrival_period and optional arrival phase/tags')
+    consumers = schedule['consumers']
+    if not isinstance(consumers, dict) or not consumers:
+        raise ValueError('Expected a nonempty map of blocking consumers to service schedules')
+    bindings = {port: (producer, mode, accept) for port, producer, mode, accept in image['connect']}
+    sources = {bindings[port][0] for port in consumers
+               if port in bindings and bindings[port][1] == 'blocking'}
+    if len(sources) != 1:
+        raise ValueError('Expected all blocking consumers of one producer')
+    producer, = sources
+    masks = {port: accept for port, (source, mode, accept) in bindings.items()
+             if source == producer and mode == 'blocking'}
+    if consumers.keys() != masks.keys():
+        raise ValueError('Expected all blocking consumers of one producer')
+    if 'arrival_tags' not in schedule and any(accept != 0xf for accept in masks.values()):
+        raise ValueError('Filtered blocking consumers require explicit arrival_tags')
+    arrivals = {key: value for key, value in schedule.items() if key != 'consumers'}
+    results = {}
+    for port, service in consumers.items():
+        if not isinstance(service, dict) or not {'service_period'} <= service.keys() <= {
+            'service_period', 'service_phase',
+        }:
+            raise ValueError(f'{port}: expected service_period and optional service_phase')
+        results[port] = analyze_periodic_channel(**arrivals, **service, accept=masks[port])
+    # Before the first rejected load, each subscriber's projection sees
+    # every arrival. A producer can load only when every projection is empty.
+    overruns = [result['clock'] for result in results.values() if result['status'] == 'overrun']
+    status = 'overrun' if overruns else (
+        'unknown' if any(result['status'] == 'unknown' for result in results.values()) else 'no_overrun'
+    )
+    outcome = {'clock': min(overruns)} if overruns else {}
+    return {'producer': producer, 'status': status, **outcome, 'consumers': results}
 
 
 def _blocking_binding(image, consumer):

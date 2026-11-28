@@ -334,3 +334,16 @@ routine unlock:
         chip.fabric.commit()
         chip.run_for(64)
         assert producer.free()
+        for period in (1, 64):
+            chip = Chip(fire_period=cadence)
+            tripc.load(chip, image)
+            producer = chip.fabric.producers['HOST_IN']
+            overrun = None
+            for clock in range(4 * period):
+                if clock % period == 0:
+                    if not producer.free():
+                        overrun = clock
+                        break
+                    producer.load(TAGS['DATA'], clock)
+                chip.step()
+            assert overrun == (1 if period == 1 else None), (cadence, period)

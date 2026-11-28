@@ -1,0 +1,104 @@
+{
+  "run": 46178126510,
+  "source_sha": "5c386527606ed2954ddc630e6d12500bba45f3b2",
+  "artifact_id": 15276338391,
+  "archive_sha256": "37509a3c80c5e281c640acfb302ff76cfc35b815b83f2c0e45e4b804eb1d1f13",
+  "prepared_input_hashes_checked": 430,
+  "full_control_and_candidate_encodings_checked": true,
+  "buffer_response_input_clock_transforms_recomputed": true,
+  "actual_response_lane_bel": "X2Y1/A",
+  "actual_response_lane_ff": true,
+  "actual_uart_sync0_bel": "X6Y1/C",
+  "producer_result": {
+    "case": "candidate",
+    "run": "46178126510",
+    "source_sha": "5c386527606ed2954ddc630e6d12500bba45f3b2",
+    "image_sha256": "c639e0014f2cd85d76aff13376385ed2bd6a1ca15e6ab63da8e83ca3dd75e0a9",
+    "placed_utilisation": {
+      "FABULOUS_LC": {
+        "used": 108,
+        "available": 128
+      },
+      "wp_timer": {
+        "used": 3,
+        "available": 4
+      },
+      "wp_shift": {
+        "used": 3,
+        "available": 4
+      },
+      "IOBUF": {
+        "used": 19,
+        "available": 42
+      },
+      "GBUF": {
+        "used": 1,
+        "available": 4
+      },
+      "SYS_RESET": {
+        "used": 0,
+        "available": 1
+      }
+    },
+    "model_fmax_mhz": 36.76,
+    "model_timing_characterized": false,
+    "requested_placement_frequency_mhz": 50,
+    "yosys_version": "Yosys 0.66+179 (git sha1 e74db6dea, Release, Clang /usr/bin/clang++ 18.1.8)\n",
+    "nextpnr_version": "\"nextpnr-generic\" -- Next Generation Place and Route (Version nextpnr-0.11.1-34-gc4fbb55a)\n",
+    "clock_constraint": {
+      "cell": "u_X1Y4_A_gbuf",
+      "bel": "X0Y4/D",
+      "logical_graph_preserved": true,
+      "source_json_sha256": "222fa6a71dd09c6a69d806dc54265dd0d26bc3f78f97f9e0099d46e4e2cc7ee1",
+      "pinned_json_sha256": "c74cd13318d9f03abafd5c190d68b05d00f011ed2553565807f2a3bad7f95fd6"
+    },
+    "placement_seed": 1,
+    "ungated_timer": true,
+    "known_lut_inputs": true,
+    "input_transform": {
+      "original_json_sha256": "b3180840589a002227d7fb217bc8c29907173541d21ba14a63a6e39dd6d98bcb",
+      "derived_json_sha256": "222fa6a71dd09c6a69d806dc54265dd0d26bc3f78f97f9e0099d46e4e2cc7ee1",
+      "proof_sha256": "e8fcd0b716ea6380ff5ca21ddce983c012d2491ca1c9f40a0fd1b30d09c56d2b",
+      "changed_cells": 58,
+      "reset_net": [
+        43
+      ],
+      "binary_cell_functions_preserved": true,
+      "sequential_and_hard_cells_preserved": true
+    },
+    "min_ctrl": 4,
+    "local_capture": false,
+    "capture_transform": null,
+    "uart_buffer": true,
+    "buffer_transform": {
+      "original_json_sha256": "6618257fed72354aad9e252efa72a49f0ad2f76037f65ce1d3bc148fdd4609f7",
+      "derived_json_sha256": "328907c17975beeb46d67bc57dc204d7342b5ca3385be0865d8b6fb9f8d90f4f",
+      "proof_sha256": "5c1293a7b95e2e95fb32fba444f2a96c1a056f1be5ecb96864c82325aedb4a19",
+      "logical_buffer_luts": 4,
+      "required_capture_bel": "X6Y1/C",
+      "expected_packed_capture_cell": "wp_uart_rx_delay_3"
+    },
+    "response_lane": true,
+    "response_transform": {
+      "original_json_sha256": "328907c17975beeb46d67bc57dc204d7342b5ca3385be0865d8b6fb9f8d90f4f",
+      "derived_json_sha256": "b3180840589a002227d7fb217bc8c29907173541d21ba14a63a6e39dd6d98bcb",
+      "proof_sha256": "92c2786eec705b5c1dce59e270bb8966f2b20dad3fcb96fd2d523fe195364854",
+      "retained_lut": "$abc$1722$auto$blifparse.cc:557:parse_blif$1761",
+      "required_bel": "X2Y1/A",
+      "capture_output": [
+        25
+      ],
+      "logical_graph_preserved": true
+    },
+    "actual_native_loading": false,
+    "timing_acceptance": false,
+    "physical_acceptance": false,
+    "adopted": false
+  },
+  "actual_native_loading": false,
+  "timing_acceptance": false,
+  "physical_acceptance": false,
+  "adopted": false,
+  "archive_verified": true,
+  "producer_identity_verified": true
+}

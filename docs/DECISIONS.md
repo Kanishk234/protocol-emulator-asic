@@ -2,6 +2,17 @@
 
 ## D-192: Place the response-lane register near the measured read-data endpoint
 
+- **Compile outcome:**46178126510 at5c386527 routes newc639e001...
+  in108/128LCs,3timers/3shifts. Root checks source/archive/all430inputs,
+  both complete FASM encodings and recomputed buffer/response/known-input/
+  clock transforms. Actual retained r_lane FF atX2Y1/A and UART sync[0]
+  atX6Y1/C; no native/timing claim. Receipt:
+  reports/r1_response_lane_compile_46178126510.json. Admit only exact
+  producer/image/transforms/site with fresh original control/native/reset/
+  full management reload then original connected RC.70focused guards and
+  exact native preparation pass; reject mixed flags, stale chain/proof or
+  changed sites. No copied selector repairs or weakened timing gates.
+
 - **Date:**2026-11-28. D191hosted46177440003 at7d78698b confirms
   setup-6.517231ns/hold-1.567830ns with native/reset/full reload PASS,
   all14497active pins annotated, zero loops/policy sensitivity. Root verifies

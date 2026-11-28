@@ -4,6 +4,16 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-28 — Selective setup mapping and UART hold-buffer experiments
 
+- D192compile46178126510 at5c386527 routes c639e001... in108/128LCs
+  with3timers/shifts. Root source/archive/all430inputs/both full encodings/
+  four transform proofs and actual r_lane FF atX2Y1/A verified; UART
+  sync[0] remainsX6Y1/C. Receipt:
+  reports/r1_response_lane_compile_46178126510.json. Exact new source/
+  image/response-chain admission,70focused guards, native preflight and
+  workflow lint pass. Hosted native/reload/RC next; no timing claim for
+  the new mapping and no inherited D191selectors. G1still selected.
+
+
 - D192compile46178126510 is running at5c386527. Independent read-only
   min-path launch query on D191finds105failing endpoint minima:23launch
   from boundary inputs;82are Q-to-D self feedback, with worst-0.047458ns.

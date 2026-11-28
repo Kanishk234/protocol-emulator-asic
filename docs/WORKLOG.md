@@ -4,6 +4,15 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-28 — Physical primitive feedback hold-buffer screen
 
+- D193cloud46181910048 atfb974bb9 is running; authentication/preparation
+  passed and native control/buffer fit/global routing is executing.
+- Rechecked official competition FAQ and exact upstream main1b6c4c79
+  (Nov25). Local6x4/ihp-cmos5lrelease assumptions need a controlled current
+  template integration; upstream GDS jobs use ttihp27a. No production/job/
+  geometry edit. Readiness report separates historical G1fallback, R1negative
+  timing, physical qualification and final release/submission work:
+  reports/submission_readiness_20261128.md. No completion percentage claimed.
+
 - Reviewed latest D191/D192evidence and physical flow. Preserve qualified
   D19146177440003 (-6.517231/-1.567830ns) and rejected placement controls.
   Existing flat extraction ODB has no placement rows; use authenticated

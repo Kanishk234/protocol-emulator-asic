@@ -104,6 +104,15 @@ Compiles the TRIPWIRE language (channel graph, reflexes, routines, pin config) i
 - slot/SRAM usage;
 - deadlock and overrun analysis for fixed-rate graphs: rates and buffer occupancy computed statically. Graphs with data-dependent rates get a warning, not a false guarantee.
 
+The opt-in `tripc --channel-schedule` JSON accepts a `consumers` object
+keyed by blocking port names for multicast. Each value gives
+`service_period` and an optional `service_phase`. Supply every blocking
+subscriber of the same producer, along with `arrival_period`, optional
+`arrival_phase`, and a repeating `arrival_tags` list for filtered ports.
+The first overrun is the earliest arrival blocked by any subscriber.
+The result assumes empty channels, static bindings, and the declared
+service opportunities.
+
 ### 4.4 Protocol reference models
 Independent Python models of UART, SPI, I2C, 1-Wire, PS/2, WS2812, DShot (and CAN if built). Used as the other side of the wire in simulation. Written from the protocol specs, not from our firmware.
 

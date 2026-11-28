@@ -269,3 +269,11 @@ available tag and payload until taken after configuration. ABC PDR
 passed unbounded and the bounded covers reached stall and drain.
 Reset and reconfiguration remain outside the hold interval. Tap-mode
 TX and other producer bindings remain outside this instance.
+
+The declared channel schedule compiler check now supports multicast
+with independently phased blocking subscribers and per-port tag
+filters. Its first-overrun result matched the independent fabric for
+1,000 schedules. The 10,000-program acyclic pipeline campaign also
+checked that every ready urgent slot with a next-EVAL selection
+guarantee fired on the eligible clock at both cadences. These results
+cover the stated graph forms and supplied traffic/service schedules.

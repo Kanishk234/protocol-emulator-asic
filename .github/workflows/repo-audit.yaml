@@ -1,9 +1,18 @@
 name: repo-audit
-on: [push, workflow_dispatch]
+run-name: ${{ inputs.pdforge_token && format('PDForge {0}', inputs.pdforge_token) || 'repo-audit' }}
+on:
+  push:
+  workflow_dispatch:
+    inputs:
+      pdforge_token:
+        description: PDForge infrastructure validation correlation token (empty runs normal audit)
+        type: string
+        default: ''
 permissions:
   contents: read
 jobs:
   audit:
+    if: inputs.pdforge_token == ''
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v6
@@ -15,3 +24,31 @@ jobs:
         run: python scripts/ci/repo_audit.py
       - name: Maintained CI helper tests
         run: PYTHONPATH=scripts/ci python -m pytest -q scripts/ci
+
+  pdforge:
+    if: inputs.pdforge_token != '' && (github.ref_name == 'autonomous-pd' || startsWith(github.ref_name, 'pdforge/'))
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    concurrency:
+      group: pdforge-validation-${{ github.ref }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - name: Validate PDForge without EDA or chip modification
+        env:
+          PDFORGE_TOKEN: ${{ inputs.pdforge_token }}
+        run: |
+          python -m venv .venv
+          source .venv/bin/activate
+          python -m pdforge.benchmarks.remote_smoke
+      - name: Preserve validation evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: pdforge-validation-${{ github.run_id }}
+          path: pdforge/.local/remote/
+          retention-days: 14
+          if-no-files-found: error

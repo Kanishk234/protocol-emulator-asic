@@ -1,0 +1,44 @@
+{
+  "run": 43946078700,
+  "source_sha": "9ee952cefedbc90f2c093a405d0775f94c34c71f",
+  "artifact_id": 14264289503,
+  "archive_sha256": "0b5f214e7fa11136c33a05a8b09977e5e3d78c771e3e7768d1594ca615d3d026",
+  "tests": {
+    "tools": 335,
+    "top": 4,
+    "protocols": 22
+  },
+  "failures": 0,
+  "errors": 0,
+  "skips": 0,
+  "available_files_verified": 34,
+  "total_receipt_inputs": 170,
+  "single_changed_source": "src/trw_pin_cfg.v",
+  "module_proof": {
+    "identity": {
+      "reference_sha256": "5335d94f004dee28bd554b5ecf16050a3a9ead81d7704941ee40d702aa196e77",
+      "candidate_sha256": "55b90c37d0c786cca1d40db523ddc6406e8c021a0d654a97dbc5f1a9dcbab614",
+      "patch_sha256": "8c65ba90c3c9d01ecab0a96986f5c20e5f2a5a55b1c140c153646f228431c32f",
+      "scope": "Unqualified follow-up: root-clock storage of pin A/B selectors and edge settings in word 1"
+    },
+    "verification": {
+      "checks": [
+        {
+          "full": 0,
+          "phase_checks": 665780,
+          "equivalence_points": 459,
+          "induction_sequence_cap": 6
+        },
+        {
+          "full": 1,
+          "phase_checks": 665780,
+          "equivalence_points": 557,
+          "induction_sequence_cap": 6
+        }
+      ],
+      "wrong_reset_mutant_rejected": true
+    },
+    "scope": "Configuration module/all outputs under registered host writes; not full-chip or physical proof"
+  },
+  "scope": "RTL/module evidence only; physical screening pending"
+}

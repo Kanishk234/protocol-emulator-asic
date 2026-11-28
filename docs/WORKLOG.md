@@ -2,6 +2,16 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-11-28 — Save remaining receipt before branch switch
+
+- Saved the existing untracked TRIPWIRE pin-selector regression receipt
+  reports/pin_select_regression_43946078700.json at the user's request to
+  commit all remaining files. JSON syntax checked; evidence was not
+  independently requalified in this cleanup. No R1 acceptance claim follows.
+- No hardware or workflow inputs changed. No phase boxes ticked.
+- Timing work remains stopped at the user's request; resume from D193
+  and the physical-probe result when requested.
+
 ## 2026-11-28 — Physical primitive feedback hold-buffer screen
 
 - D193cloud46181910048 atfb974bb9 is running; authentication/preparation

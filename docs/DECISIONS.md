@@ -1,5 +1,25 @@
 # Decisions
 
+## D-190: Qualify the routed UART input-buffer image at the original capture site
+
+- **Date:**2026-11-28. Corrected compile46174945380 at6664e4ce passes
+  placement/routing with the unchanged pinned nextpnr, original rawc6and
+  candidate31ed78fd...108/128LCs/3timers/3shifts. The retained final LUT
+  packs with the intended sync[0] FF, FF=1 atX6Y1/C; clock remains bank D.
+  Root authenticates archive/all429inputs/both complete FASM encodings,
+  recomputes buffer/known-input/clock JSON and proof chains and verifies
+  the capture output net. BUG181placement workaround validated for this
+  point. Receipt: reports/r1_uart_buffer_compile_46174945380.json.
+- Pin exact producer/image/seed/clock/buffer proof and requested capture
+  site. Reject mixed local-capture mapping, altered threshold, type-swapped
+  markers, wrong source/derived hashes or a different site. Positive exact
+  preparation and mutation guards pass. Compiler estimates do not measure
+  buffer minimum delay or hold closure.
+- Require fresh original control/candidate/reset/full management reload,
+  actual8736-bit frame checks and then original connected20ns/0.25nsRC.
+  This is actual data-path buffering, with the FF primitive/clock/set/output
+  preserved. No path exception, artificial delay or copied selector repair.
+
 ## D-189: Qualify the exact selective capture-control image
 
 - **Date:**2026-11-28. Compile46174326690 at2ad3f6eb reproduces rawc6

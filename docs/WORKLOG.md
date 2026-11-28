@@ -4,6 +4,17 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-28 — Selective setup mapping and UART hold-buffer experiments
 
+- Corrected UART compile46174945380 at6664e4ce succeeds with the same
+  pinned compiler: rawc6and new31ed78fd...108/128LC/3timers/3shifts.
+  Root verifies archive/all429inputs/full two encodings/recomputed buffer/
+  fill/clock chains and actual registered sync[0] atX6Y1/C, clock D.
+  BUG181workaround validated; no native/hold benefit claimed. Receipt:
+  reports/r1_uart_buffer_compile_46174945380.json. D190admits only this
+  exact image to fresh native/reset/reload then original connected RC.
+- Selective-control native46175430185 at949714ca is running.107focused
+  guards passed before launch; separate UART identity/source/site mutation
+  guards and exact-source preparation now pass as well.
+
 - Selective-control compile46174326690 at2ad3f6eb succeeds: original
   rawc6and new0d7858fb...106/128LC/3timers/3shifts, actual bank D.
   Root verifies archive/all430inputs/vendor ABI/both complete encodings/

@@ -1,0 +1,158 @@
+{
+  "run": {
+    "id": 46174945380,
+    "head_sha": "6664e4ce9986045d6197a7391c06fbb228665136",
+    "head_branch": "efpga",
+    "run_attempt": 1,
+    "conclusion": "success",
+    "path": ".github/workflows/r1_uart_buffer_compile.yaml"
+  },
+  "artifact": {
+    "id": 15275132602,
+    "name": "r1-uart-buffer-compile-46174945380",
+    "source_run": 46174945380,
+    "size_in_bytes": 341591,
+    "digest": "sha256:3f9b6191ed87ccca23629399e34189f808cf61a38cc721c94384c8f5023b71d7"
+  },
+  "archive_verified": true,
+  "prepared_input_hashes_checked": 429,
+  "both_full_fasm_encodings_verified": true,
+  "buffer_transform_and_proof_recomputed": true,
+  "unused_input_transform_and_proof_recomputed": true,
+  "clock_constraint_recomputed": true,
+  "actual_clock_bank": "X0Y4/D",
+  "actual_uart_capture_bel": "X6Y1/C",
+  "uart_capture_output_net_and_ff_mode_verified": true,
+  "placement_crash_workaround_validated": true,
+  "cases": {
+    "control": {
+      "case": "control",
+      "run": "46174945380",
+      "source_sha": "6664e4ce9986045d6197a7391c06fbb228665136",
+      "image_sha256": "c6b96ef02d052b405f58b9742acbff02c0fd0c4e31f6d278e09649d1a5e6991f",
+      "placed_utilisation": {
+        "FABULOUS_LC": {
+          "used": 103,
+          "available": 128
+        },
+        "wp_timer": {
+          "used": 3,
+          "available": 4
+        },
+        "wp_shift": {
+          "used": 3,
+          "available": 4
+        },
+        "IOBUF": {
+          "used": 19,
+          "available": 42
+        },
+        "GBUF": {
+          "used": 1,
+          "available": 4
+        },
+        "SYS_RESET": {
+          "used": 0,
+          "available": 1
+        }
+      },
+      "model_fmax_mhz": 40.6,
+      "model_timing_characterized": false,
+      "requested_placement_frequency_mhz": 50,
+      "yosys_version": "Yosys 0.66+179 (git sha1 e74db6dea, Release, Clang /usr/bin/clang++ 18.1.8)\n",
+      "nextpnr_version": "\"nextpnr-generic\" -- Next Generation Place and Route (Version nextpnr-0.11.1-34-gc4fbb55a)\n",
+      "clock_constraint": null,
+      "placement_seed": 1,
+      "ungated_timer": false,
+      "known_lut_inputs": false,
+      "input_transform": null,
+      "min_ctrl": 4,
+      "local_capture": false,
+      "capture_transform": null,
+      "uart_buffer": false,
+      "buffer_transform": null,
+      "actual_native_loading": false,
+      "timing_acceptance": false,
+      "physical_acceptance": false,
+      "adopted": false
+    },
+    "candidate": {
+      "case": "candidate",
+      "run": "46174945380",
+      "source_sha": "6664e4ce9986045d6197a7391c06fbb228665136",
+      "image_sha256": "31ed78fda6153babc0bbdb11e8c2a1501cf4000b400bfbdd097fd095a8e5ed47",
+      "placed_utilisation": {
+        "FABULOUS_LC": {
+          "used": 108,
+          "available": 128
+        },
+        "wp_timer": {
+          "used": 3,
+          "available": 4
+        },
+        "wp_shift": {
+          "used": 3,
+          "available": 4
+        },
+        "IOBUF": {
+          "used": 19,
+          "available": 42
+        },
+        "GBUF": {
+          "used": 1,
+          "available": 4
+        },
+        "SYS_RESET": {
+          "used": 0,
+          "available": 1
+        }
+      },
+      "model_fmax_mhz": 35.36,
+      "model_timing_characterized": false,
+      "requested_placement_frequency_mhz": 50,
+      "yosys_version": "Yosys 0.66+179 (git sha1 e74db6dea, Release, Clang /usr/bin/clang++ 18.1.8)\n",
+      "nextpnr_version": "\"nextpnr-generic\" -- Next Generation Place and Route (Version nextpnr-0.11.1-34-gc4fbb55a)\n",
+      "clock_constraint": {
+        "cell": "u_X1Y4_A_gbuf",
+        "bel": "X0Y4/D",
+        "logical_graph_preserved": true,
+        "source_json_sha256": "6edcbeac31f77ec475fbdd9718384cab8be1cfda223c80990aaa38969d0c986d",
+        "pinned_json_sha256": "40876e4927f7485b1facdeeaeee70414605089aae441c5fa27a72450deb8fb0b"
+      },
+      "placement_seed": 1,
+      "ungated_timer": true,
+      "known_lut_inputs": true,
+      "input_transform": {
+        "original_json_sha256": "328907c17975beeb46d67bc57dc204d7342b5ca3385be0865d8b6fb9f8d90f4f",
+        "derived_json_sha256": "6edcbeac31f77ec475fbdd9718384cab8be1cfda223c80990aaa38969d0c986d",
+        "proof_sha256": "e8fcd0b716ea6380ff5ca21ddce983c012d2491ca1c9f40a0fd1b30d09c56d2b",
+        "changed_cells": 58,
+        "reset_net": [
+          43
+        ],
+        "binary_cell_functions_preserved": true,
+        "sequential_and_hard_cells_preserved": true
+      },
+      "min_ctrl": 4,
+      "local_capture": false,
+      "capture_transform": null,
+      "uart_buffer": true,
+      "buffer_transform": {
+        "original_json_sha256": "6618257fed72354aad9e252efa72a49f0ad2f76037f65ce1d3bc148fdd4609f7",
+        "derived_json_sha256": "328907c17975beeb46d67bc57dc204d7342b5ca3385be0865d8b6fb9f8d90f4f",
+        "proof_sha256": "5c1293a7b95e2e95fb32fba444f2a96c1a056f1be5ecb96864c82325aedb4a19",
+        "logical_buffer_luts": 4,
+        "required_capture_bel": "X6Y1/C",
+        "expected_packed_capture_cell": "wp_uart_rx_delay_3"
+      },
+      "actual_native_loading": false,
+      "timing_acceptance": false,
+      "physical_acceptance": false,
+      "adopted": false
+    }
+  },
+  "scope": "Fit/routing and binary buffer identity only; no measured hold or native/reload/RC claim.",
+  "timing_acceptance": false,
+  "physical_acceptance": false,
+  "adopted": false
+}

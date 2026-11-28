@@ -2,6 +2,13 @@
 
 ## 181: Constrained temporary UART FF crashes pinned nextpnr after packing
 
+- **Workaround validated:**46174945380 at6664e4ce completes placement/
+  routing with the same pinned compiler, using the constraint on retained
+  LUT. Root confirms intended sync[0] output, FF=1 and actualX6Y1/C,
+  all429prepared hashes/both full encodings and recomputed transform
+  chains. Native/hold timing still open. Receipt:
+  reports/r1_uart_buffer_compile_46174945380.json.
+
 - **Symptom/check:**46174326685 at2ad3f6eb reproduces rawc6control,
   then nextpnr fails during analytical placement with vector index163
   versus size136. Inventory108/128LC; no routed candidate or timing.

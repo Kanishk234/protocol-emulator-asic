@@ -1,0 +1,80 @@
+{
+  "source_run": 46177440003,
+  "source_sha": "7d78698b5cf5445b2c2ff668ccf6186feaa06a21",
+  "scope": "Independent read-only local query on the exact native-loaded configuration and connected nominal RC of the qualified hosted run. Same 20ns/0.25ns conditions. One worst min path per timed endpoint, not an enumeration of all possible paths.",
+  "negative_hold_endpoints": 105,
+  "boundary_launch_endpoints": 23,
+  "register_launch_endpoints": 82,
+  "self_feedback_endpoints": 82,
+  "cross_register_worst_endpoints": 0,
+  "boundary_start_counts": {
+    "Tile_X2Y0_A_OUT_top": 2,
+    "Tile_X7Y1_B_OUT_top": 1,
+    "Tile_X4Y0_A_OUT_top": 1,
+    "Tile_X1Y0_A_OUT_top": 2,
+    "Tile_X0Y3_B_OUT_top": 5,
+    "Tile_X7Y1_A_OUT_top": 2,
+    "Tile_X3Y4_A_OUT_top": 4,
+    "Tile_X0Y3_D_OUT_top": 1,
+    "Tile_X0Y3_A_OUT_top": 2,
+    "Tile_X0Y3_C_OUT_top": 1,
+    "Tile_X2Y4_B_OUT_top": 1,
+    "Tile_X3Y0_A_OUT_top": 1
+  },
+  "self_feedback_by_tile": {
+    "Tile_X2Y2_PRIM2T2S": 33,
+    "Tile_X5Y2_PRIM2T2S": 35,
+    "Tile_X3Y3_LUT4x8_ha": 2,
+    "Tile_X3Y2_LUT4x8_ha": 1,
+    "Tile_X5Y3_LUT4x8_ha": 1,
+    "Tile_X2Y3_LUT4x8_ha": 2,
+    "Tile_X2Y1_LUT4x8_ha": 3,
+    "Tile_X4Y1_LUT4x8_ha": 1,
+    "Tile_X4Y2_LUT4x8_ha": 2,
+    "Tile_X3Y1_LUT4x8_ha": 1,
+    "Tile_X4Y3_LUT4x8_ha": 1
+  },
+  "worst_boundary": [
+    {
+      "start": "Tile_X2Y0_A_OUT_top",
+      "end": "Tile_X2Y2_PRIM2T2S/_2201_/D",
+      "slack_ns": -1.56783
+    },
+    {
+      "start": "Tile_X7Y1_B_OUT_top",
+      "end": "Tile_X6Y1_LUT4x8_ha/_1732_/D",
+      "slack_ns": -1.466177
+    },
+    {
+      "start": "Tile_X4Y0_A_OUT_top",
+      "end": "Tile_X4Y1_LUT4x8_ha/_1735_/D",
+      "slack_ns": -1.392965
+    }
+  ],
+  "worst_self_feedback": [
+    {
+      "start": "Tile_X2Y2_PRIM2T2S/_2183_/Q",
+      "end": "Tile_X2Y2_PRIM2T2S/_2183_/D",
+      "slack_ns": -0.047458
+    },
+    {
+      "start": "Tile_X5Y2_PRIM2T2S/_2183_/Q",
+      "end": "Tile_X5Y2_PRIM2T2S/_2183_/D",
+      "slack_ns": -0.042866
+    },
+    {
+      "start": "Tile_X5Y2_PRIM2T2S/_2185_/Q",
+      "end": "Tile_X5Y2_PRIM2T2S/_2185_/D",
+      "slack_ns": -0.035167
+    }
+  ],
+  "query_script_sha256": "22ff1dad0263cd194682580a9f20eb7198e897b50a78fd27c4bfe2ec056da190",
+  "query_log_sha256": "2362e0f70c6f9499391ad9329cff9596193fa634238de792f6e1ebdc374c538b",
+  "representative_feedback_probe_script_sha256": "53d58539506c6b1783004be5be3b272d93fa0853439336a6ab2a2e8bc9571ac0",
+  "representative_feedback_probe_log_sha256": "d623bb1ffd99d2197d3d493787429dd18c7c01ed2685bfac4f05d3f6e8d8f6fe",
+  "representative_feedback_data_arrival_ns": 2.369029,
+  "representative_feedback_data_required_ns": 2.416486,
+  "timing_acceptance": false,
+  "physical_acceptance": false,
+  "adopted": false
+}

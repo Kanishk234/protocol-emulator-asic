@@ -52,3 +52,23 @@ D19146177440003 confirms the four-selector setup improvement in CI:
 14497active pins annotated and no loops/policy differences. No closure.
 D192requests one response-lane placement near the measured host read-data
 endpoint. Preserve D191and reject inherited selector repairs after re-routing.
+
+
+Remaining hold work, measured from46177440003: an independent read-only
+query finds105failing endpoint minima:23boundary launches and82self-feedback
+Q-to-D paths. A full-clock-expanded primitive query reproduces -0.047458ns
+(arrival2.369029ns, required2.416486ns) with the original0.25nsuncertainty.
+See `r1_hold_inventory_46177440003.json`. These are worst paths per endpoint,
+not all paths. Input buffering alone cannot address the internal primitive
+feedback. Replacing user placement alone cannot change that native leaf path.
+
+The next physical investigation should reproduce one primitive feedback path
+at its actual loaded configuration, then test native hold repair on a separate
+derived leaf: preserve every original cell/configuration latch and only insert
+real noninverting delay on a proved feedback branch. Check logical equivalence,
+added cell area and native routing/DRC/antenna/LVS before re-extraction. Cover
+all affected physical contexts and rerun actual native/reload/configured timing;
+keep original macro/control and both loop policies. This physical repair is
+planned, not implemented or accepted. Boundary holds also need the real shell
+launch/clock context plus any measured physical buffering; retain the original
+zero-I/O boundary result separately and do not waive failures or lower uncertainty.

@@ -4,6 +4,17 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-28 — Selective setup mapping and UART hold-buffer experiments
 
+- D192compile46178126510 is running at5c386527. Independent read-only
+  min-path launch query on D191finds105failing endpoint minima:23launch
+  from boundary inputs;82are Q-to-D self feedback, with worst-0.047458ns.
+  Separate full-clock-expanded primitive probe reproduces this exact slack
+  (arrival2.369029ns, required2.416486ns). This rules out input buffering
+  alone as a complete hold fix. Receipt:
+  reports/r1_hold_inventory_46177440003.json. Physical feedback hold
+  repair is a separate required investigation; no path exception or weakened
+  uncertainty, no changed macro/netlist and no closure claim.
+
+
 - D191hosted46177440003 at7d78698b confirms setup-6.517231ns/
   hold-1.567830ns, native/reset/full reload PASS; zero loops/policy
   differences,14497active pins annotated. Root archive/55,55,64inputs/

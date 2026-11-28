@@ -1,5 +1,24 @@
 # Decisions
 
+## D-189: Qualify the exact selective capture-control image
+
+- **Date:**2026-11-28. Compile46174326690 at2ad3f6eb reproduces rawc6
+  and routes selective-control candidate0d7858fb... in106/128LCs with
+  three timers/shifts and actual clock bank D. Root authenticates archive,
+  all430input hashes/vendor ESR semantics, both full FASM encodings and
+  recomputes original-to-capture-to-known-input-to-clock JSON/proof chains.
+  All eight new data LUTs pack with FFs. Compiler timing is uncharacterized.
+  Receipt: reports/r1_local_capture_compile_46174326690.json.
+- Admit only this producer/image/seed/clock and exact transform hashes;
+  require candidate local-capture true/control false, both thresholds4,
+  no UART-buffer flag and a consistent hash chain. Reject wrong primitive
+  proof, mixed variants, Boolean type substitutions or altered source files.
+  Positive actual preparation and mutation guards pass before staging.
+- Full hosted original control/candidate/reset/management reload and all
+  observed8736-bit audits precede original connected20ns/0.25nsRC checks.
+  No copied two-/twelve-selector repairs, private-state initialization or
+  timing exceptions. A routed image is not native/timing acceptance.
+
 ## D-188: Separate selective capture-control mapping and UART data buffering
 
 - **Date:**2026-11-28. D18746061527240 at41638e9e passes native/reset/

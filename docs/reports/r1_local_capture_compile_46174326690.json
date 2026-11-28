@@ -1,0 +1,158 @@
+{
+  "run": {
+    "id": 46174326690,
+    "head_sha": "2ad3f6ebaae38c5dfedf760096d868548e778173",
+    "head_branch": "efpga",
+    "run_attempt": 1,
+    "conclusion": "success",
+    "path": ".github/workflows/r1_local_capture_compile.yaml"
+  },
+  "artifact": {
+    "id": 15275440664,
+    "name": "r1-local-capture-compile-46174326690",
+    "source_run": 46174326690,
+    "size_in_bytes": 347631,
+    "digest": "sha256:d174f59d0bd742bc13d5cc5a259037c8293237cc7616a7f542e5a7bea4dc86be"
+  },
+  "archive_verified": true,
+  "prepared_input_hashes_checked": 430,
+  "both_full_fasm_encodings_verified": true,
+  "vendor_cell_semantics_checked": true,
+  "capture_transform_and_proof_recomputed": true,
+  "unused_input_transform_and_proof_recomputed": true,
+  "clock_constraint_recomputed": true,
+  "actual_clock_bank": "X0Y4/D",
+  "eight_capture_luts_packed_with_flip_flops": true,
+  "cases": {
+    "control": {
+      "case": "control",
+      "run": "46174326690",
+      "source_sha": "2ad3f6ebaae38c5dfedf760096d868548e778173",
+      "image_sha256": "c6b96ef02d052b405f58b9742acbff02c0fd0c4e31f6d278e09649d1a5e6991f",
+      "placed_utilisation": {
+        "FABULOUS_LC": {
+          "used": 103,
+          "available": 128
+        },
+        "wp_timer": {
+          "used": 3,
+          "available": 4
+        },
+        "wp_shift": {
+          "used": 3,
+          "available": 4
+        },
+        "IOBUF": {
+          "used": 19,
+          "available": 42
+        },
+        "GBUF": {
+          "used": 1,
+          "available": 4
+        },
+        "SYS_RESET": {
+          "used": 0,
+          "available": 1
+        }
+      },
+      "model_fmax_mhz": 40.6,
+      "model_timing_characterized": false,
+      "requested_placement_frequency_mhz": 50,
+      "yosys_version": "Yosys 0.66+179 (git sha1 e74db6dea, Release, Clang /usr/bin/clang++ 18.1.8)\n",
+      "nextpnr_version": "\"nextpnr-generic\" -- Next Generation Place and Route (Version nextpnr-0.11.1-34-gc4fbb55a)\n",
+      "clock_constraint": null,
+      "placement_seed": 1,
+      "ungated_timer": false,
+      "known_lut_inputs": false,
+      "input_transform": null,
+      "min_ctrl": 4,
+      "local_capture": false,
+      "capture_transform": null,
+      "uart_buffer": false,
+      "buffer_transform": null,
+      "actual_native_loading": false,
+      "timing_acceptance": false,
+      "physical_acceptance": false,
+      "adopted": false
+    },
+    "candidate": {
+      "case": "candidate",
+      "run": "46174326690",
+      "source_sha": "2ad3f6ebaae38c5dfedf760096d868548e778173",
+      "image_sha256": "0d7858fb5c52ea2e65c2b2a2dcb435b6f6344c5f714ec3f82263de9174c341fc",
+      "placed_utilisation": {
+        "FABULOUS_LC": {
+          "used": 106,
+          "available": 128
+        },
+        "wp_timer": {
+          "used": 3,
+          "available": 4
+        },
+        "wp_shift": {
+          "used": 3,
+          "available": 4
+        },
+        "IOBUF": {
+          "used": 19,
+          "available": 42
+        },
+        "GBUF": {
+          "used": 1,
+          "available": 4
+        },
+        "SYS_RESET": {
+          "used": 0,
+          "available": 1
+        }
+      },
+      "model_fmax_mhz": 25.32,
+      "model_timing_characterized": false,
+      "requested_placement_frequency_mhz": 50,
+      "yosys_version": "Yosys 0.66+179 (git sha1 e74db6dea, Release, Clang /usr/bin/clang++ 18.1.8)\n",
+      "nextpnr_version": "\"nextpnr-generic\" -- Next Generation Place and Route (Version nextpnr-0.11.1-34-gc4fbb55a)\n",
+      "clock_constraint": {
+        "cell": "u_X1Y4_A_gbuf",
+        "bel": "X0Y4/D",
+        "logical_graph_preserved": true,
+        "source_json_sha256": "68d8eb312263503e60d6693006a053f6c566ecfaba5fc9d28a02ed539b8e0102",
+        "pinned_json_sha256": "d0aa3a651965ecaebbbcd5aeb9cf39a06224024d61563b2ac378549d721a15c3"
+      },
+      "placement_seed": 1,
+      "ungated_timer": true,
+      "known_lut_inputs": true,
+      "input_transform": {
+        "original_json_sha256": "c08b28fa382f60061a9fd2f8b8b16465a76cd599593b6c1a623aac763bec4ad3",
+        "derived_json_sha256": "68d8eb312263503e60d6693006a053f6c566ecfaba5fc9d28a02ed539b8e0102",
+        "proof_sha256": "e8fcd0b716ea6380ff5ca21ddce983c012d2491ca1c9f40a0fd1b30d09c56d2b",
+        "changed_cells": 58,
+        "reset_net": [
+          43
+        ],
+        "binary_cell_functions_preserved": true,
+        "sequential_and_hard_cells_preserved": true
+      },
+      "min_ctrl": 4,
+      "local_capture": true,
+      "capture_transform": {
+        "original_json_sha256": "6618257fed72354aad9e252efa72a49f0ad2f76037f65ce1d3bc148fdd4609f7",
+        "derived_json_sha256": "c08b28fa382f60061a9fd2f8b8b16465a76cd599593b6c1a623aac763bec4ad3",
+        "proof_sha256": "4edc6222dd50ac7622edf6e80b2c2cdfaed3833716ddaa297760d26472b3d3f8",
+        "changed_flip_flops": 8,
+        "binary_transitions_per_ff": 16,
+        "same_ff_primitive_and_clock": true,
+        "vendor_cells_sha256": "292b61eede9ec5fe76a246a47a2269ba57f82e0f10b80bc7d53cba5fd96fdd64"
+      },
+      "uart_buffer": false,
+      "buffer_transform": null,
+      "actual_native_loading": false,
+      "timing_acceptance": false,
+      "physical_acceptance": false,
+      "adopted": false
+    }
+  },
+  "scope": "Fit/routing and binary transformation only; native/reset/reload/RC remain required.",
+  "timing_acceptance": false,
+  "physical_acceptance": false,
+  "adopted": false
+}

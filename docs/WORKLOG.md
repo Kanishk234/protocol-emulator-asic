@@ -4,6 +4,15 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-28 — Selective setup mapping and UART hold-buffer experiments
 
+- Selective-control compile46174326690 at2ad3f6eb succeeds: original
+  rawc6and new0d7858fb...106/128LC/3timers/3shifts, actual bank D.
+  Root verifies archive/all430inputs/vendor ABI/both complete encodings/
+  both transform proofs/clock-only pinning and eight packed data FFs.
+  Receipt: reports/r1_local_capture_compile_46174326690.json. D189pins
+  only this image for native/reset/full reload then original connected RC.
+- BUG181workaround pushed at6664e4ce; UART rerun46174945380 is running.
+  No placement-workaround or hold-delay success claim before its result.
+
 - Both D188compiles launched at2ad3f6eb: capture46174326690, UART
   buffer46174326685. UART fails before routing in nextpnr's placement
   validity indexing (163versus136), not a completed capacity measurement.

@@ -1,0 +1,118 @@
+{
+  "run": 46177440003,
+  "source_sha": "7d78698b5cf5445b2c2ff668ccf6186feaa06a21",
+  "artifact_id": 15276298039,
+  "archive_sha256": "674eefe47d0a49ccf41c6530321f082f9d687a039b4c23a38eba308e73a4ca33",
+  "archive_verified": true,
+  "prepared_input_hashes_checked": {
+    "sa_functional/plan.json": 40,
+    "r1_loop_timing/plan.json": 6,
+    "r1_loop_timing/baseline/plan.json": 20
+  },
+  "native_cases": {
+    "control": {
+      "strict_tests": 1,
+      "input_hashes_checked": 55,
+      "configuration_bits_checked": 8736,
+      "image_sha256": "9af858413aa8c39739f3f7bda8e290433d58cb1702f69a04c9c6e74657b90410",
+      "snapshot_sha256": "0491a427285f53b27db8166c875d76536fe237c4e619277be297d8791ed94ba7"
+    },
+    "candidate": {
+      "strict_tests": 1,
+      "input_hashes_checked": 55,
+      "configuration_bits_checked": 8736,
+      "image_sha256": "68f0496bf1b6c389ec87dc90df38d1fc6639a1cabd750cc047469045a8183e06",
+      "snapshot_sha256": "bfff20b860ac6166439ab862e87d7a73511552cedf14e1b11b87ee45b2af785a"
+    },
+    "shell": {
+      "strict_tests": 1,
+      "input_hashes_checked": 64,
+      "configuration_bits_checked": 8736,
+      "image_sha256": "68f0496bf1b6c389ec87dc90df38d1fc6639a1cabd750cc047469045a8183e06",
+      "snapshot_sha256": "bfff20b860ac6166439ab862e87d7a73511552cedf14e1b11b87ee45b2af785a"
+    }
+  },
+  "all_native_and_management_reload_passed": true,
+  "original_connected_failure_reproduced": true,
+  "four_timing_script_case_execution_coverage_audits_passed": true,
+  "timing_result": {
+    "run": "46177440003",
+    "source_sha": "7d78698b5cf5445b2c2ff668ccf6186feaa06a21",
+    "diagnostic_complete": true,
+    "models": {
+      "setup": {
+        "edge_registers": 370,
+        "inactive_unobservable": 126,
+        "clocked_timed": 233,
+        "clocked_constant_data": 11,
+        "endpoints": 252,
+        "worst_slack_ns": -6.517231,
+        "worst_endpoint": "Tile_X1Y0_A_IN_top",
+        "structural_loops": 0,
+        "loop_policy_sensitive": false,
+        "loop_policy_differences": [],
+        "structural_loops_by_policy": {
+          "static": 0,
+          "dynamic": 0
+        }
+      },
+      "hold": {
+        "edge_registers": 370,
+        "inactive_unobservable": 126,
+        "clocked_timed": 233,
+        "clocked_constant_data": 11,
+        "endpoints": 252,
+        "worst_slack_ns": -1.56783,
+        "worst_endpoint": "Tile_X2Y2_PRIM2T2S/_2201_/D",
+        "structural_loops": 0,
+        "loop_policy_sensitive": false,
+        "loop_policy_differences": [],
+        "structural_loops_by_policy": {
+          "static": 0,
+          "dynamic": 0
+        }
+      }
+    },
+    "coverage": {
+      "routed_setup_static": {
+        "active_pins": 14497,
+        "fully_missing_drivers": 35,
+        "partially_missing_loads": 0,
+        "active_missing_drivers": [],
+        "passed": true
+      },
+      "routed_setup_dynamic": {
+        "active_pins": 14497,
+        "fully_missing_drivers": 35,
+        "partially_missing_loads": 0,
+        "active_missing_drivers": [],
+        "passed": true
+      },
+      "routed_hold_static": {
+        "active_pins": 14497,
+        "fully_missing_drivers": 35,
+        "partially_missing_loads": 0,
+        "active_missing_drivers": [],
+        "passed": true
+      },
+      "routed_hold_dynamic": {
+        "active_pins": 14497,
+        "fully_missing_drivers": 35,
+        "partially_missing_loads": 0,
+        "active_missing_drivers": [],
+        "passed": true
+      }
+    },
+    "model_qualified": true,
+    "necessary_macro_constraints_met": false,
+    "actual_native_run": "46177440003",
+    "actually_loaded_image_sha256": "68f0496bf1b6c389ec87dc90df38d1fc6639a1cabd750cc047469045a8183e06",
+    "timing_acceptance": false,
+    "physical_acceptance": false,
+    "adopted": false,
+    "scope": "Actually loaded placement image on unchanged source-proven connected nominal RC, original 20ns/0.25ns/conditional zero-I/O boundary. Original failing parent retained. No full-chip/PVT/loading-mode acceptance."
+  },
+  "timing_acceptance": false,
+  "physical_acceptance": false,
+  "adopted": false
+}

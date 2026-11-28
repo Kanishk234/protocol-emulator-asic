@@ -4,6 +4,21 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-28 — Selective setup mapping and UART hold-buffer experiments
 
+- D191hosted46177440003 at7d78698b confirms setup-6.517231ns/
+  hold-1.567830ns, native/reset/full reload PASS; zero loops/policy
+  differences,14497active pins annotated. Root archive/55,55,64inputs/
+  three8736-bit frames/40,6,20plan inputs/four scripts/executions checked.
+  Receipt: reports/r1_uart_setup_spares_native_timing_46177440003.json.
+  This supersedes the local-only status below. Timing remains negative.
+- D192adds one retained-LUT placement constraint for measured response-lane
+  launch, X2Y1/A near host read data, preserving logical graph and UART
+  buffers. Actual packed FF/site/Q guards included.61focused guards,
+  actual-netlist transform, exact eight-proof/resource preparation and lint
+  pass. Fresh routed image/native/timing still required; retain D191image.
+- **Next:** hosted D192compile/control, then fresh image-specific native/
+  reload/RC qualification if it fits. No phase boxes ticked; G1selected.
+
+
 - D191hosted qualification46177440003 is running at7d78698b. Local
   extracted diagnostic on the actually loaded four-selector image improves
   setup to-6.517231ns; hold stays-1.567830ns. Both loop policies agree,

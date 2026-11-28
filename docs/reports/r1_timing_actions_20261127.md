@@ -45,3 +45,10 @@ Selective capture controls46175430185 fail native ready definedness and do
 not reach timing. D191four freshly proved spare selectors on the UART-buffer
 image pass local native/restart; hosted reload/extracted timing remain required.
 G1 stays selected. No constraints or phase gates have been relaxed.
+
+
+D19146177440003 confirms the four-selector setup improvement in CI:
+-6.517231ns setup/-1.567830ns hold, native/reset/full reload PASS,
+14497active pins annotated and no loops/policy differences. No closure.
+D192requests one response-lane placement near the measured host read-data
+endpoint. Preserve D191and reject inherited selector repairs after re-routing.

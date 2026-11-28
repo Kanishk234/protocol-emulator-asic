@@ -1,5 +1,27 @@
 # Decisions
 
+## D-192: Place the response-lane register near the measured read-data endpoint
+
+- **Date:**2026-11-28. D191hosted46177440003 at7d78698b confirms
+  setup-6.517231ns/hold-1.567830ns with native/reset/full reload PASS,
+  all14497active pins annotated, zero loops/policy sensitivity. Root verifies
+  archive/55,55,64simulation hashes/three8736-bit frames/40,6,20plan
+  inputs and all4scripts/cases/executions/coverage. Receipt:
+  reports/r1_uart_setup_spares_native_timing_46177440003.json. No closure.
+- Worst setup launches logical u_user.r_lane atX5Y3/H and reaches host
+  h_rdata[4] atX1Y0/A. Request only its retained driving LUT atX2Y1/A
+  in a fresh UART-buffer compile. Keep the original FF primitive/clock/reset/
+  data/output, other constraints, pins, source, seed1 and MIN_CTRL4. Logical
+  graph equality is checked. Do not constrain a temporary FF (BUG181);
+  post-pack require retained LUT FF=1, exact site and r_lane Q identity.
+- Original rawc6compile control first. Recompute known-input routing and
+  bank-D constraints after this placement-only transform. Four D191selector
+  repairs are image-specific and are not copied to a new routing. Preserve
+  the qualified D191image separately.61focused guards/exact resource and
+  eight-proof preparation/actual-netlist transform/workflow lint pass.
+  Fit, native function and timing remain unmeasured for the new candidate.
+  No hardware, constraint, phase gate or production adoption change.
+
 ## D-191: Test four setup-path spare selectors on the qualified UART-buffer image
 
 - **Date:**2026-11-28. UART-buffer qualification46175928642 at6c34b822

@@ -20,7 +20,9 @@ def test_buffer_preserves_binary_data_and_synchronizer_controls():
     assert source==original and proof['logical_buffer_luts']==4
     old=proof['before'];new=proof['after'];assert old['type']==new['type']
     for pin in ('CLK','S','O'):assert old['connections'][pin]==new['connections'][pin]
-    assert new['attributes']['NEXTPNR_BEL']=='X6Y1/C'
+    assert new['attributes']==old['attributes']
+    assert proof['chain'][-1]['cell']['attributes']['NEXTPNR_BEL']=='X6Y1/C'
+    assert all('NEXTPNR_BEL' not in row['cell']['attributes'] for row in proof['chain'][:-1])
     for value in (0,1):
         for reset in (0,1):
             signal=value

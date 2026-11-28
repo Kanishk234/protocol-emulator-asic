@@ -36,7 +36,11 @@ def buffer_uart_rx(design):
         m['cells'][lutname]=lut;m['netnames'][lutname]={'hide_name':0,'bits':out,'attributes':{}}
         chain.append(dict(name=lutname,cell=copy.deepcopy(lut)));signal=out
     cell['connections']['D']=signal
-    cell['attributes'].update(NEXTPNR_BEL='X6Y1/C',BEL_STRENGTH=format(6,'032b'))
+    # The packer deletes the FF after merging it into the last LUT. Constrain
+    # that retained cell, not the temporary FF that would leave a stale binding.
+    m['cells']['wp_uart_rx_delay_3']['attributes'].update(
+        NEXTPNR_BEL='X6Y1/C',BEL_STRENGTH=format(6,'032b'))
+    chain[-1]['cell']=copy.deepcopy(m['cells']['wp_uart_rx_delay_3'])
     return derived,dict(ff=name,before=before,after=copy.deepcopy(cell),chain=chain,
         logical_buffer_luts=4,required_capture_bel='X6Y1/C',expected_packed_capture_cell='wp_uart_rx_delay_3',
         scope='Binary data identity with unchanged FF primitive/clock/set/output. Physical delay, fit and native/reload/timing require measurement.')

@@ -37,6 +37,11 @@ def main():
         raise ValueError('Expected one pad output-enable update')
     verify(output, 'pending-lost-oe', source.replace(oe_update, 'oe <= oe;'),
            properties, '-seq 8', 'model found: FAIL!')
+    carrier_mask = 'nlvx[0] && !(car_on && cph_next)'
+    if source.count(carrier_mask) != 1:
+        raise ValueError('Expected one cached carrier mask')
+    verify(output, 'pending-uncarried', source.replace(carrier_mask, 'nlvx[0]'),
+           properties, '-seq 8', 'model found: FAIL!', configurations=(1,))
 
 
 def check(output, source, scenario, deadline, depth):
@@ -52,10 +57,10 @@ def check(output, source, scenario, deadline, depth):
         verify(output, f'{scenario}-{name}', source, body, f'-seq {depth}', expected)
 
 
-def verify(output, name, source, properties, options, expected):
+def verify(output, name, source, properties, options, expected, configurations=(0, 1)):
     design = output / f'{name}.v'
     design.write_text(source.replace('endmodule', properties + 'endmodule'))
-    for full in (0, 1):
+    for full in configurations:
         cmd = (
             f'read_verilog -formal -sv -I src build/formal_tx_cursor/{design.name}; '
             f'hierarchy -top trw_pin_tx -chparam FULL {full} -chparam USE_LEVEL_CACHE {full}; '

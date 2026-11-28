@@ -1,0 +1,33 @@
+{
+  "family": "placement",
+  "mechanism": "infrastructure validation",
+  "expected_effect": "Validate PDForge infrastructure on a cloud runner",
+  "falsifier": "Tests fail or evidence identity does not match source/run/token",
+  "baseline": "0cb08fbb19bbacceba61b57f5701b95ac96bcfffbade22fcd3eccd3ad3c952fb",
+  "patch_hash": "c5449f79bb636603ccb19214c82d27de2ced6769efa976be5a720121c0aae1bc",
+  "checks": [
+    "correctness",
+    "placement",
+    "congestion",
+    "cts",
+    "setup",
+    "pdn"
+  ],
+  "cost": {
+    "wall_s": 300,
+    "cpu_s": 600,
+    "disk_bytes": 100000000,
+    "remote_minutes": 5,
+    "agent_tokens": 0,
+    "full_flows": 0,
+    "spend_usd": 0.1
+  },
+  "stage": "static",
+  "rollback": "Discard isolated experiment",
+  "evidence": [
+    "fixture-placement"
+  ],
+  "seed": 0,
+  "config_hash": "f04d3191e858a675ef4b01b15db2d39ef15ed150ada2c262383b916506993a3f",
+  "tool_hash": "ecfd5d2af0742f1e1779378e4df6a44838f9ea1ddb9dac6b14a42fb1d791af63"
+}

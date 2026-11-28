@@ -1,0 +1,10 @@
+# Research starting points and engineering implications
+Initial literature scan, not exhaustive or reproduced. Retrieve exact revisions and relevant sections locally; verify licenses and capabilities before reuse.
+- ChatEDA, IEEE TCAD 2024: https://doi.org/10.1109/TCAD.2024.3383347 — separate task planning and script execution; use typed proposals and controlled executor.
+- ISPD 2026 survey, Agentic AI for Physical Design R&D: https://vlsicad.ucsd.edu/Publications/Conferences/423/c423.pdf — identifies ChipNeMo, ORAssistant, EDA Corpus, multi-agent automation and ORFS Agent. Follow bibliography for originals, compare applicability and benchmark methodology. Do not claim performance numbers without reading originals.
+- OpenROAD developer guide: https://openroad.readthedocs.io/en/latest/contrib/DeveloperGuide.html — use native OpenDB/STA and routing interfaces instead of scraping screenshots.
+- Parasitics: https://openroad.readthedocs.io/en/latest/main/src/est/README.html — distinguish placement estimates, global-route estimates and extracted SPEF; validate source and stage.
+- Resizer: https://openroad.readthedocs.io/en/latest/main/src/rsz/README.html — consult pinned repair behavior and constraints, not latest flags blindly.
+- Global routing: https://github.com/The-OpenROAD-Project/OpenROAD/blob/master/src/grt/README.md — use actual congestion reports and routing topology.
+- LibreLane steps: https://librelane.readthedocs.io/en/latest/reference/step_config_vars.html — verify stage inputs/outputs/config against installed version.
+- Additional repositories to investigate: https://github.com/The-OpenROAD-Project/OpenROAD-flow-scripts (AutoTuner), https://github.com/The-OpenROAD-Project/OpenSTA, https://github.com/librelane/librelane, https://github.com/YosysHQ/yosys, https://github.com/IHP-GmbH/IHP-Open-PDK, https://github.com/NVlabs/AutoDMP. Compare deterministic search, Bayesian optimization, multi-fidelity selection, and agent-guided design changes; no assumption that macro placement tuning generalizes to TRIPWIRE closure.

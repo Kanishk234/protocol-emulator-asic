@@ -4,6 +4,15 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-28 — Selective setup mapping and UART hold-buffer experiments
 
+- Both D188compiles launched at2ad3f6eb: capture46174326690, UART
+  buffer46174326685. UART fails before routing in nextpnr's placement
+  validity indexing (163versus136), not a completed capacity measurement.
+  Root verifies archive/original rawc6/full encoding/source helper commit.
+  BUG181moves the same capture-site constraint from deleted temporary FF
+  to retained final LUT; post-route FF/site guard unchanged.24focused
+  checks and source/resource preparation pass; fresh hosted run required.
+  Receipt: reports/r1_uart_buffer_placement_failure_46174326685.json.
+
 - D18746061527240 at41638e9e passes native/reset/full management reload;
   qualified worst slacks remain-34.141884/-1.226009ns, zero loops and
   full13304-pin active annotation. Root authenticates archive, all3strict

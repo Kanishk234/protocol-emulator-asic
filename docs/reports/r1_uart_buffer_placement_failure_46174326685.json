@@ -1,0 +1,23 @@
+{
+  "run": 46174326685,
+  "source_sha": "2ad3f6ebaae38c5dfedf760096d868548e778173",
+  "artifact_id": 15275345562,
+  "archive_sha256": "fdb7dcc0cc413a3d93b4afc7926b3cca202f489c446bb265a3e6a7ea49bc1a9b",
+  "archive_verified": true,
+  "original_control_reproduced": true,
+  "control_full_fasm_encoding_verified": true,
+  "source_helper_commit_hash_verified": true,
+  "pre_routing_lc_inventory": {
+    "used": 108,
+    "available": 128
+  },
+  "failure": "Pinned nextpnr throws std::out_of_range during analytical placement: index163 versus vector size136",
+  "stage": "placement before routing",
+  "constraint_was_on_temporary_ff": true,
+  "workaround": "Move the same X6Y1/C constraint to the retained last LUT, verify registered capture placement after packing/routing; pinned compiler unchanged.",
+  "workaround_validated": false,
+  "complete_candidate_bitstream": false,
+  "timing_acceptance": false,
+  "physical_acceptance": false,
+  "adopted": false
+}

@@ -1,5 +1,21 @@
 # Bugs
 
+## 181: Constrained temporary UART FF crashes pinned nextpnr after packing
+
+- **Symptom/check:**46174326685 at2ad3f6eb reproduces rawc6control,
+  then nextpnr fails during analytical placement with vector index163
+  versus size136. Inventory108/128LC; no routed candidate or timing.
+- **Diagnosis/workaround:** the pre-pack X6Y1/C constraint was attached to
+  a FF that is deleted when merged into its driving LUT. Constrain retained
+  `wp_uart_rx_delay_3` instead; keep the FF attributes unchanged. Require
+  final packed cell FF=1 and actual placementX6Y1/C. This tests stale
+  binding as the cause without editing or replacing pinned nextpnr.
+- **Coverage:** source helper/failed archive/original full FASM checked;
+  regression requires constraint on retained LUT only and original FF
+  metadata intact. Both binary buffer identity and source/proof/resource
+  preparation pass. Hosted workaround validation remains required.
+  Receipt: reports/r1_uart_buffer_placement_failure_46174326685.json.
+
 ## 180: Two-selector staging retains the raw compiler image report
 
 - **Resolved in46045747168 at32796d4a:** repaired candidate and full

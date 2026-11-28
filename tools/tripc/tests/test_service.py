@@ -66,7 +66,6 @@ def tiny(body):
     '    load16 r0, 2\n    loop:\n    djnz r0, loop\n    ret\n',
     '    setst A\n    ret\n',
     '    nop\n    ret\n',
-    '    ret\n    ret\n',
 ])
 def test_refuse_unchecked_control_flow_or_progress(body):
     result = routine_service(tiny(body), 'worker')
@@ -107,25 +106,41 @@ def test_unknown_routine_has_no_bound():
     assert routine_service(image, 'absent')['bound_clocks'] is None
 
 
+def branch_trace(image, phase, value, limit):
+    chip = Chip()
+    tripc.load(chip, image)
+    chip.lanes[0].regs[1] = value
+    chip.lanes[0].regs[3] = 500
+    chip.cycle = phase
+    chip.step()
+    assert chip.lanes[0].rb
+    while chip.lanes[0].rb and chip.cycle - phase <= limit:
+        chip.step()
+    assert not chip.lanes[0].rb
+    return chip.cycle - phase
+
+
 @pytest.mark.parametrize('phase', range(4))
 def test_forward_branch_service_bounds_both_paths(phase):
     image = tiny('    add r0, r1, 0\n    br done if rz\n    ld r2, r3\n    done:\n    ret\n')
     result = routine_service(image, 'worker')
     assert result['status'] == 'conditional_bound'
-    elapsed = []
-    for value in (0, 1):
-        chip = Chip()
-        tripc.load(chip, image)
-        chip.lanes[0].regs[1] = value
-        chip.lanes[0].regs[3] = 500
-        chip.cycle = phase
-        chip.step()
-        assert chip.lanes[0].rb
-        while chip.lanes[0].rb and chip.cycle - phase <= result['bound_clocks']:
-            chip.step()
-        assert not chip.lanes[0].rb
-        elapsed.append(chip.cycle - phase)
-    assert elapsed[0] < elapsed[1] <= result['bound_clocks']
+    limit = result['bound_clocks']
+    assert branch_trace(image, phase, 0, limit) < branch_trace(image, phase, 1, limit) <= limit
+
+
+def test_early_return_uses_longest_access_path_and_preserves_store_premise():
+    image = tiny('    add r0, r1, 0\n    br store if rz\n'
+                 '    ld r2, r3\n    ld r2, r3\n    ret\n'
+                 '    store:\n    st r2, r3\n    ret\n')
+    result = routine_service(image, 'worker')
+    assert result['status'] == 'conditional_bound'
+    assert result['instruction_fetches'] == 5
+    assert result['data_reads'] == 2 and result['data_writes'] == 0
+    assert result['bound_clocks'] == 35
+    assert not result['data_write_nonalias_proven']
+    for phase in range(4):
+        assert branch_trace(image, phase, 0, 35) < branch_trace(image, phase, 1, 35) <= 35
 
 
 def test_report_uses_access_envelope_not_old_step_only_estimate():

@@ -1,0 +1,18 @@
+{
+  "run": {
+    "id": 46175928642,
+    "head_sha": "6c34b82217aa58938ac9be8bbf4a70108a62620c",
+    "head_branch": "efpga",
+    "run_attempt": 1,
+    "conclusion": "success",
+    "path": ".github/workflows/r1_uart_buffer_native.yaml"
+  },
+  "artifact": {
+    "id": 15275985957,
+    "name": "r1-uart-buffer-native-timing-46175928642",
+    "source_run": 46175928642,
+    "size_in_bytes": 14056110,
+    "digest": "sha256:a26b8d7c44d1ec6c68c6e85430da77edd4b19761db8e9e19a87ac9b08b82ea2d"
+  },
+  "member": "."
+}

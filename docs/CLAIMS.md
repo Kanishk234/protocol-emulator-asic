@@ -235,3 +235,10 @@ clears echo when no higher-priority burst effect owns the edge. Full and
 lean passed with arbitrary inputs after initial reset. Removing the OE
 update caused a counterexample in both. Carrier-modulated pad behavior
 and complete TX deadlines remain separate.
+
+Native full TX induction proves the cached pad level matches the
+registered logical level masked by the captured carrier state, with the
+idle polarity supplied for the post-edge configuration. The lean output
+check uses the live idle polarity. Removing the cached carrier mask
+produced a counterexample. Exact carrier periods remain a separate
+timing obligation.

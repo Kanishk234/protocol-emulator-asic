@@ -1,0 +1,89 @@
+name: R1 response lane placement compile
+on:
+  workflow_dispatch:
+  push:
+    branches: [efpga]
+    paths: [.github/workflows/r1_response_lane_compile.yaml]
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: warp-r1-response-lane-compile
+  cancel-in-progress: false
+jobs:
+  placement:
+    if: github.ref == 'refs/heads/efpga'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PYTHONPATH: tools:test_internal:spikes/r1
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - uses: actions/cache@v5
+        with:
+          path: ~/oss-cad-suite
+          key: oss-cad-suite-2026-06-29
+      - name: Install pinned Yosys if cache is absent
+        run: |
+          if [ ! -x "$HOME/oss-cad-suite/bin/yosys" ]; then
+            curl -sfL -o /tmp/ocs.tgz https://github.com/YosysHQ/oss-cad-suite-build/releases/download/2026-06-29/oss-cad-suite-linux-x64-20260629.tgz
+            tar -xzf /tmp/ocs.tgz -C ~
+          fi
+      - uses: actions/cache@v5
+        with:
+          path: ~/.cache/warp/ocs-2026-09-27
+          key: oss-cad-suite-nextpnr-2026-09-27
+      - name: Authenticate original compiler resource and eight completed proof cases
+        timeout-minutes: 15
+        run: |
+          bash scripts/setup_venv.sh
+          source .venv/bin/activate
+          python -m pytest -q tools/profiling/tests/test_r1_spi_tick_pipeline_trial.py tools/profiling/tests/test_r1_spi_tick_pipeline_compile.py tools/profiling/tests/test_r1_known_lut_inputs.py tools/profiling/tests/test_r1_uart_input_buffer.py tools/profiling/tests/test_r1_response_lane_placement.py
+          bash scripts/fetch_nextpnr.sh
+          bash scripts/fetch_tiles.sh
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          from assembly_fetch import api,admit_run,artifact
+          from spi_tick_pipeline_compile import prepare
+          row=json.loads(Path('spikes/r1/routed_timing_sources.json').read_text())['sources']['capsule']
+          repo=os.environ['GITHUB_REPOSITORY']
+          producer=api(f'repos/{repo}/actions/runs/{row["run"]["id"]}')
+          admit_run(producer,row['run'])
+          target=Path('build/r1_placement_sources').resolve();target.mkdir(parents=True,exist_ok=False)
+          capsule=artifact(repo,row['artifact'],target)/row['member']
+          proof=json.loads(Path('spikes/r1/spi_tick_ungated_proof_sources.json').read_text())
+          actual=api(f'repos/{repo}/actions/runs/{proof["run"]["id"]}');admit_run(actual,proof['run'])
+          proof_dir=target/'proofs';proof_dir.mkdir()
+          for item in proof['artifacts']:artifact(repo,item,proof_dir)
+          (target/'proof.producer.json').write_text(json.dumps(actual,indent=2)+'\n')
+          prepare(capsule,proof_dir,Path('build/r1_placement_trial'),ungated_timer=True,known_inputs=True,uart_buffer=True,response_lane=True)
+          Path('build/r1_placement_trial/producer.json').write_text(json.dumps(producer,indent=2)+'\n')
+          PY
+      - name: Reproduce original compiler image at explicit 50 MHz
+        timeout-minutes: 12
+        run: |
+          source .venv/bin/activate
+          export PATH="$VIRTUAL_ENV/bin:$HOME/oss-cad-suite/bin:$PATH"
+          timeout --kill-after=10s 600s python spikes/r1/spi_tick_pipeline_compile.py run --out build/r1_placement_trial --case control > build/r1_placement_trial/control-compile.log 2>&1
+      - name: Compile one response lane placement constraint with identical source, pins and seed
+        timeout-minutes: 12
+        run: |
+          source .venv/bin/activate
+          export PATH="$VIRTUAL_ENV/bin:$HOME/oss-cad-suite/bin:$PATH"
+          timeout --kill-after=10s 600s python spikes/r1/spi_tick_pipeline_compile.py run --out build/r1_placement_trial --case candidate > build/r1_placement_trial/candidate-compile.log 2>&1
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: r1-response-lane-compile-${{ github.run_id }}
+          path: |
+            build/r1_placement_trial/
+            build/r1_placement_sources/*.producer.json
+            build/r1_placement_sources/*.metadata.json
+            build/r1_placement_sources/proofs/*.metadata.json
+          include-hidden-files: true
+          retention-days: 90

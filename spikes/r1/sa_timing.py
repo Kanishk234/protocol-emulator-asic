@@ -79,7 +79,8 @@ def prepare(rc,proof,native,capsule,pdk,functional,out):
               '0d51924b9ad26a1993e41889be1bf0756dd40870041304dd7db8947c85191657',
               '0d7858fb5c52ea2e65c2b2a2dcb435b6f6344c5f714ec3f82263de9174c341fc',
               '31ed78fda6153babc0bbdb11e8c2a1501cf4000b400bfbdd097fd095a8e5ed47',
-              '1ad31736231b59f806f2b6bc1906351647af10aff1ec002cc9dd93027bcdc700'}
+              '1ad31736231b59f806f2b6bc1906351647af10aff1ec002cc9dd93027bcdc700',
+              'c639e0014f2cd85d76aff13376385ed2bd6a1ca15e6ab63da8e83ca3dd75e0a9'}
     if quiescence['source_image_sha256'] not in admitted:
         raise ValueError('Require an admitted fixed-source placement image')
     if sha(image)!=data['cases']['candidate']['image_sha256'] or sha(functional/'candidate/configuration-state.json')!=data['cases']['candidate']['observed_configuration_sha256']:

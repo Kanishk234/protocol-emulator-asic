@@ -286,15 +286,21 @@ def test_invalid_arrival_tags(tags):
         analyze_periodic_channel(2, 3, arrival_tags=tags)
 
 
-def test_multicast_declared_service_matches_fabric():
+@pytest.mark.parametrize('first_mask,second_mask', [
+    (' accept=DATA', ' accept=EVENT'),
+    (' accept=DATA|EVENT', ' accept=EVENT'),
+    ('', ''),
+    (' accept=CTRL', ' accept=ERR'),
+])
+def test_multicast_declared_service_matches_fabric(first_mask, second_mask):
     from itertools import product
     from math import lcm
 
     from tripsim.fabric import Fabric
 
-    image, _ = tripc.compile_text("""program multicast
-connect L0.I0 <- HOST_IN accept=DATA
-connect L1.I0 <- HOST_IN accept=EVENT
+    image, _ = tripc.compile_text(f"""program multicast
+connect L0.I0 <- HOST_IN{first_mask}
+connect L1.I0 <- HOST_IN{second_mask}
 connect L0.I1 <- HOST_IN tap
 """)
     services = [(period, phase) for period in range(1, 5) for phase in range(period)]

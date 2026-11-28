@@ -266,6 +266,14 @@
 
 ## 171: Clock-bank D placement fails native initialization despite exact configuration
 
+- **Related mapping failure, not a proven common root cause:** response-lane
+  placement46178870330 at2dc43c7d fails the same readyX assertion at115981ns.
+  Original native control/generated RTL pass; both actual8736-bit frames match.
+  Nine fresh cofactor/carry-safe selectors still fail locally (one undefined
+  alternate rejected). Retain strict rejection and original positive D191image;
+  no native/timing acceptance. Receipt:
+  reports/r1_response_lane_native_failure_46178870330.json.
+
 - **Symptom/check:**44829301770 at a7dad2be passes its matched A-bank
   native control, then rejects the D-bank candidate: host-write ready becomes
   unknown at115981ns. Generated RTL for the same image passes; management

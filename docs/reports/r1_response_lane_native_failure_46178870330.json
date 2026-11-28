@@ -1,0 +1,66 @@
+{
+  "run": 46178870330,
+  "source_sha": "2dc43c7db09ea1b9f9f4e785688dac0b858c2a41",
+  "artifact_id": 15277045582,
+  "archive_sha256": "a21dd7a6bc8d0483b90bf9970b73fd0fe2b18bd3dd657ced432d8f0ce02cdc55",
+  "archive_verified": true,
+  "actual_frame_audits": {
+    "control": {
+      "configuration_bits": 8736,
+      "image_sha256": "9af858413aa8c39739f3f7bda8e290433d58cb1702f69a04c9c6e74657b90410",
+      "snapshot_sha256": "0491a427285f53b27db8166c875d76536fe237c4e619277be297d8791ed94ba7"
+    },
+    "candidate": {
+      "configuration_bits": 8736,
+      "image_sha256": "5b0ff287284c2694a3183151f37e6f1e1562814aff8ea85010feb35d18faff37",
+      "snapshot_sha256": "9599cbf1f6a8ba4d6e174e50aacbc9ce5f2a85582ed19a80dc518089c8040b55"
+    }
+  },
+  "strict_original_control_passed": true,
+  "producer_result": {
+    "run": "46178870330",
+    "source_sha": "2dc43c7db09ea1b9f9f4e785688dac0b858c2a41",
+    "passed": false,
+    "cases": {
+      "control": {
+        "passed": true,
+        "image_sha256": "9af858413aa8c39739f3f7bda8e290433d58cb1702f69a04c9c6e74657b90410",
+        "observed_configuration_sha256": "0491a427285f53b27db8166c875d76536fe237c4e619277be297d8791ed94ba7",
+        "configuration_bits": 8736
+      }
+    },
+    "trial_kind": "spi_tick_response_lane",
+    "timing_acceptance": false,
+    "physical_acceptance": false,
+    "adopted": false,
+    "error": "XML contains failures, errors or skipped tests",
+    "generated_rtl_candidate": {
+      "passed": true,
+      "scope": "Generated RTL diagnostic only; original native failure retained."
+    }
+  },
+  "management_reload_reached": false,
+  "extracted_timing_reached": false,
+  "local_nine_selector_trial": {
+    "rejected_unknown_source": [
+      "X2Y1",
+      "E",
+      1
+    ],
+    "changed_bits": 9,
+    "proofs_recomputed": true,
+    "full_encoding_checked": true,
+    "passed": false,
+    "scope": "Guarded local diagnostic; original hosted failure retained. No timing claim.",
+    "actual_configuration_bits_checked": 8736,
+    "actual_latch_changes_checked": 9
+  },
+  "timing_acceptance": false,
+  "physical_acceptance": false,
+  "adopted": false,
+  "strict_generated_rtl_passed": true,
+  "first_failure": {
+    "time_ns": 115981.0,
+    "error": "configured host-write ready became unknown"
+  }
+}

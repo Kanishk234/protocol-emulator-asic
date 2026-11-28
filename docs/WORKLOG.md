@@ -4,6 +4,25 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-28 — Selective setup mapping and UART hold-buffer experiments
 
+- D192native46178870330 at2dc43c7d fails readyX at115981ns; original
+  native control and generated RTL pass. Root authenticates archive and
+  both8736-bit frame observations. No management reload or extracted
+  timing reached. Receipt:
+  reports/r1_response_lane_native_failure_46178870330.json.
+- Fresh local response-cone scan yields10possible selectors; actual native
+  alias/definedness checking rejects X2Y1/E.I1. Remaining9fresh cofactor/
+  carry-proved selectors still fail native. Full encoding/exact9actual latch
+  changes/all8736bits checked. Reject bounded hypothesis; no blind sweep.
+- **Session result:** qualified D19146177440003 remains the best setup
+  point measured here (-6.517231ns), with hold-1.567830ns. D192is rejected.
+  No phase boxes ticked and no production adoption. Work is committed on
+  efpga; G1 remains selected. **Next:** prioritize a separately derived physical
+  feedback hold-repair experiment using the measured82self paths, alongside
+  actual shell/input timing and targeted buffering for23boundary minima.
+  Preserve D191and all failing controls; require new extraction/native/reload/
+  timing/physical gates for any changed physical artifact.
+
+
 - D192compile46178126510 at5c386527 routes c639e001... in108/128LCs
   with3timers/shifts. Root source/archive/all430inputs/both full encodings/
   four transform proofs and actual r_lane FF atX2Y1/A verified; UART

@@ -72,3 +72,11 @@ keep original macro/control and both loop policies. This physical repair is
 planned, not implemented or accepted. Boundary holds also need the real shell
 launch/clock context plus any measured physical buffering; retain the original
 zero-I/O boundary result separately and do not waive failures or lower uncertainty.
+
+
+D192response-lane placement fits (46178126510) but fails native qualification
+46178870330 at115981ns readyX. Original control/generated RTL and both actual
+frame audits pass. A bounded nine-selector local repair also fails; do not adopt
+this mapping or copy its unused-input changes. Preserve qualified D191.
+Physical feedback hold repair now has a measured target independent of these
+failed mapping trials; retain all stated physical and native qualification gates.

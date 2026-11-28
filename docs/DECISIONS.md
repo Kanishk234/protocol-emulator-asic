@@ -2,6 +2,13 @@
 
 ## D-192: Place the response-lane register near the measured read-data endpoint
 
+- **Rejected native outcome:**46178870330 at2dc43c7d fails readyX at
+  115981ns; original native control/generated RTL pass and both actual
+  8736-bit frame audits match. No reload/STA. Fresh local nine-selector
+  diagnostic also fails; tenth alternate source is undefined and rejected.
+  Original D191image remains preserved. Receipt:
+  reports/r1_response_lane_native_failure_46178870330.json. No acceptance.
+
 - **Compile outcome:**46178126510 at5c386527 routes newc639e001...
   in108/128LCs,3timers/3shifts. Root checks source/archive/all430inputs,
   both complete FASM encodings and recomputed buffer/response/known-input/

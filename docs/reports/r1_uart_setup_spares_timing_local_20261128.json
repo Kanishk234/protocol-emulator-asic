@@ -1,0 +1,85 @@
+{
+  "scope": "Local extracted timing diagnostic from actual native-loaded four-selector image. Cloud full management reload and timing qualification pending in46177440003.",
+  "parent_run": 46175928642,
+  "hosted_run_pending": 46177440003,
+  "loaded_image_sha256": "68f0496bf1b6c389ec87dc90df38d1fc6639a1cabd750cc047469045a8183e06",
+  "configuration_snapshot_sha256": "bfff20b860ac6166439ab862e87d7a73511552cedf14e1b11b87ee45b2af785a",
+  "clock_period_ns": 20,
+  "uncertainty_ns": 0.25,
+  "boundary": "Original conditional zero I/O delays; not full-chip signoff.",
+  "models": {
+    "setup": {
+      "edge_registers": 370,
+      "inactive_unobservable": 126,
+      "clocked_timed": 233,
+      "clocked_constant_data": 11,
+      "endpoints": 252,
+      "worst_slack_ns": -6.517231,
+      "worst_endpoint": "Tile_X1Y0_A_IN_top",
+      "structural_loops": 0,
+      "loop_policy_sensitive": false,
+      "loop_policy_differences": []
+    },
+    "hold": {
+      "edge_registers": 370,
+      "inactive_unobservable": 126,
+      "clocked_timed": 233,
+      "clocked_constant_data": 11,
+      "endpoints": 252,
+      "worst_slack_ns": -1.56783,
+      "worst_endpoint": "Tile_X2Y2_PRIM2T2S/_2201_/D",
+      "structural_loops": 0,
+      "loop_policy_sensitive": false,
+      "loop_policy_differences": []
+    }
+  },
+  "timing_executions": {
+    "routed_setup_static": {
+      "script_sha256": "18307b115c2b6677a6b3abf55b7a5b3172231e753f52a4ec75d77c6248f7787b",
+      "log_sha256": "dddb8379d60c948fa02aae0269721fb4a93ab85ee1de6846cda7fdb8b05a7b3c",
+      "annotation": {
+        "active_pins": 14497,
+        "fully_missing_drivers": 35,
+        "partially_missing_loads": 0,
+        "active_missing_drivers": [],
+        "passed": true
+      }
+    },
+    "routed_setup_dynamic": {
+      "script_sha256": "64c2c0326a54bcd93b3628ad9c7d0bd5142fa43b99fc30f3ab952e20a84be7ba",
+      "log_sha256": "dddb8379d60c948fa02aae0269721fb4a93ab85ee1de6846cda7fdb8b05a7b3c",
+      "annotation": {
+        "active_pins": 14497,
+        "fully_missing_drivers": 35,
+        "partially_missing_loads": 0,
+        "active_missing_drivers": [],
+        "passed": true
+      }
+    },
+    "routed_hold_static": {
+      "script_sha256": "6dc877c2602229df6718dcb9a040bc879da6fe9e0fa9a38233c3a5e9e5c5a9b1",
+      "log_sha256": "92ea3ac2cdab66c779bc01c3118fad96dac3532110798e3d97d9f8fe107ab0d7",
+      "annotation": {
+        "active_pins": 14497,
+        "fully_missing_drivers": 35,
+        "partially_missing_loads": 0,
+        "active_missing_drivers": [],
+        "passed": true
+      }
+    },
+    "routed_hold_dynamic": {
+      "script_sha256": "5ddb4444b6042d6411b84018cb31584bff1a8fdf599c82112b3f4003b853c5d3",
+      "log_sha256": "92ea3ac2cdab66c779bc01c3118fad96dac3532110798e3d97d9f8fe107ab0d7",
+      "annotation": {
+        "active_pins": 14497,
+        "fully_missing_drivers": 35,
+        "partially_missing_loads": 0,
+        "active_missing_drivers": [],
+        "passed": true
+      }
+    }
+  },
+  "timing_acceptance": false,
+  "physical_acceptance": false,
+  "adopted": false
+}

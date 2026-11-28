@@ -4,6 +4,17 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-28 — Selective setup mapping and UART hold-buffer experiments
 
+- D191hosted qualification46177440003 is running at7d78698b. Local
+  extracted diagnostic on the actually loaded four-selector image improves
+  setup to-6.517231ns; hold stays-1.567830ns. Both loop policies agree,
+  no loops, full active annotation. Receipt:
+  reports/r1_uart_setup_spares_timing_local_20261128.json. This does not
+  substitute for pending hosted management reload/RC. Current worst setup
+  is logical r_lane atX5Y3/H to host h_rdata[4]; remaining capture paths
+  launch nedge[1] atX3Y2/H. Targeted placement is the next mapping option
+  if hosted qualification reproduces; no new seed or hardware sweep.
+
+
 - UART-buffer qualification46175928642 at6c34b822 passes native/reset/
   full management reload. Root archive/three8736-bit frames/55,55,64inputs/
   17,6,20plan inputs/four scripts and timing reports checked. Qualified RC

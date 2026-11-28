@@ -1,0 +1,69 @@
+name: R1 primitive data hold buffer fit and routing
+on:
+  workflow_dispatch:
+  push:
+    branches: [efpga]
+    paths: [.github/workflows/r1_primitive_hold_probe.yaml]
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: warp-r1-primitive-hold-probe
+  cancel-in-progress: false
+jobs:
+  probe:
+    if: github.ref == 'refs/heads/efpga'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 65
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PDK_ROOT: ${{ github.workspace }}/build/r1_hold_pdk
+      PYTHONPATH: tools:test_internal:spikes/r1
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Authenticate original leaf, native model and buffer branch guards
+        timeout-minutes: 18
+        run: |
+          bash scripts/setup_venv.sh
+          source .venv/bin/activate
+          python -m pytest -q tools/profiling/tests/test_r1_primitive_hold_probe.py tools/profiling/tests/test_r1_detailed_context.py
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          from assembly_fetch import api,admit_run,artifact
+          from primitive_hold_probe import prepare
+          all_sources=json.loads(Path('spikes/r1/routed_timing_sources.json').read_text())['sources']
+          repo=os.environ['GITHUB_REPOSITORY'];target=Path('build/r1_hold_sources').resolve();target.mkdir(parents=True,exist_ok=False)
+          roots={}
+          for name in ('capsule','native'):
+              row=all_sources[name];producer=api(f'repos/{repo}/actions/runs/{row["run"]["id"]}')
+              admit_run(producer,row['run'])
+              roots[name]=artifact(repo,row['artifact'],target)/row['member']
+              (target/(name+'.producer.json')).write_text(json.dumps(producer,indent=2)+'\n')
+          prepare(**roots,out=Path('build/r1_hold_probe'))
+          PY
+          bash spikes/cloud/fetch_pdk.sh
+      - name: Compare original and data-buffered primitive on unchanged routing policy
+        timeout-minutes: 42
+        run: |
+          set -euo pipefail
+          image=ghcr.io/librelane/librelane@sha256:d109140b8f17fc54f4fca998beb8124f4949404ec52e339eebd2250854a18b5a
+          docker pull "$image"
+          docker image inspect "$image" > build/r1_hold_probe/image.json
+          timeout 2340s docker run --rm -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -w "$GITHUB_WORKSPACE" \
+            -e PDK_ROOT -e PYTHONPATH "$image" \
+            python3 spikes/r1/primitive_hold_probe.py inside --out build/r1_hold_probe > build/r1_hold_probe/probe.log 2>&1
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: r1-primitive-hold-probe-${{ github.run_id }}
+          path: |
+            build/r1_hold_probe/
+            build/r1_hold_sources/*.producer.json
+            build/r1_hold_sources/*.metadata.json
+          include-hidden-files: true
+          retention-days: 90
+          if-no-files-found: error

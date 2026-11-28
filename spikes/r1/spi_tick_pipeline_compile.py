@@ -37,7 +37,7 @@ def placement_seed(plan,case):
     return 1 if case=='control' else seed
 
 
-def prepare(capsule,proofs,out,candidate_seed=1,ungated_timer=False,known_inputs=False,candidate_min_ctrl=4,local_capture=False,uart_buffer=False):
+def prepare(capsule,proofs,out,candidate_seed=1,ungated_timer=False,known_inputs=False,candidate_min_ctrl=4,local_capture=False,uart_buffer=False,response_lane=False):
     from autonomy.check_xml import check_xml
     placement_seed({'candidate_seed':candidate_seed},'candidate')
     if type(known_inputs) is not bool:raise ValueError('Explicit Boolean input-routing mode required')
@@ -48,6 +48,8 @@ def prepare(capsule,proofs,out,candidate_seed=1,ungated_timer=False,known_inputs
     if (type(uart_buffer) is not bool or uart_buffer and
             (local_capture or not ungated_timer or not known_inputs or candidate_min_ctrl!=4)):
         raise ValueError('UART buffer is a separate proved-source experiment at the original threshold')
+    if type(response_lane) is not bool or response_lane and not uart_buffer:
+        raise ValueError('Response-lane placement requires the separate UART-buffer experiment')
     capsule,proofs,out=(Path(p).resolve() for p in (capsule,proofs,out))
     resource=capsule/'model/resource';desc=json.loads((resource/'resource-control.json').read_text())
     if desc['radix']!='radix8_2' or any(sha(resource/p)!=h for p,h in desc['generated_sha256'].items()):
@@ -98,8 +100,9 @@ def prepare(capsule,proofs,out,candidate_seed=1,ungated_timer=False,known_inputs
         vendor_semantics(vendor.read_text())
         bound += [ROOT/'spikes/r1/local_capture_controls.py',vendor]
     if uart_buffer:bound.append(ROOT/'spikes/r1/uart_input_buffer.py')
+    if response_lane:bound.append(ROOT/'spikes/r1/response_lane_placement.py')
     (out/'plan.json').write_text(json.dumps(dict(capsule=str(capsule),resource=str(resource),arch=str(shadow),
-        inputs={str(p):sha(p) for p in bound},params=report['params'],candidate_seed=candidate_seed,candidate_min_ctrl=candidate_min_ctrl,ungated_timer=ungated_timer,known_lut_inputs=known_inputs,local_capture=local_capture,vendor_cells=str(vendor) if vendor else None,uart_buffer=uart_buffer,
+        inputs={str(p):sha(p) for p in bound},params=report['params'],candidate_seed=candidate_seed,candidate_min_ctrl=candidate_min_ctrl,ungated_timer=ungated_timer,known_lut_inputs=known_inputs,local_capture=local_capture,vendor_cells=str(vendor) if vendor else None,uart_buffer=uart_buffer,response_lane=response_lane,
         scope=f'Source-proved registered SPI terminal pulse, timer enable '+('held high' if ungated_timer else 'state gated')+f', same frozen physical fabric, pins and parameters; original control seed1/MIN_CTRL4, candidate seed{candidate_seed}/MIN_CTRL{candidate_min_ctrl}, 50MHz request and GBUF USER-pinned to original bank D. '+('Candidate unused LUT inputs explicitly routed to existing reset with binary-equivalent truth tables. ' if known_inputs else '')+'Compiler timing remains uncharacterized; no native, extracted timing or adoption claim.'),indent=2)+'\n')
 
 
@@ -128,9 +131,9 @@ def run(out,case):
         expected=Path(plan['capsule'])/'model/compile/uart_spi_11/concurrency.wbit'
         if control['case']!='control' or control['image_sha256']!=sha(expected) or control['source_sha']!=os.environ.get('GITHUB_SHA'):
             raise ValueError('Same-revision original compile control did not reproduce')
-    original=compiler.run;clock_constraint=None;input_transform=None;capture_transform=None;buffer_transform=None
+    original=compiler.run;clock_constraint=None;input_transform=None;capture_transform=None;buffer_transform=None;response_transform=None
     def request_frequency(command,log,cwd,env=None):
-        nonlocal clock_constraint,input_transform,capture_transform,buffer_transform
+        nonlocal clock_constraint,input_transform,capture_transform,buffer_transform,response_transform
         if Path(command[0]).name=='nextpnr-generic':
             command=[*command,'--freq','50']
             if case=='candidate':
@@ -143,6 +146,15 @@ def run(out,case):
                     buffer_transform=dict(original_json_sha256=sha(source),derived_json_sha256=sha(target),
                         proof_sha256=sha(receipt),logical_buffer_luts=4,required_capture_bel='X6Y1/C',
                         expected_packed_capture_cell=proof['expected_packed_capture_cell'])
+                    source=target
+                if plan.get('response_lane',False):
+                    from response_lane_placement import pin_response_lane
+                    derived,proof=pin_response_lane(json.loads(source.read_text()))
+                    target=out/case/'design_response_lane.json';target.write_text(json.dumps(derived)+'\n')
+                    receipt=out/case/'response-lane-proof.json';receipt.write_text(json.dumps(proof,indent=2)+'\n')
+                    response_transform=dict(original_json_sha256=sha(source),derived_json_sha256=sha(target),
+                        proof_sha256=sha(receipt),retained_lut=proof['retained_lut'],required_bel=proof['required_bel'],
+                        capture_output=proof['capture_output'],logical_graph_preserved=True)
                     source=target
                 if plan.get('local_capture',False):
                     from local_capture_controls import vendor_semantics,absorb_capture
@@ -189,6 +201,12 @@ def run(out,case):
             if (cell.get('attributes',{}).get('NEXTPNR_BEL')!='X6Y1/C' or
                     int(cell.get('parameters',{}).get('FF','0'),2)!=1):
                 raise ValueError('UART capture FF placement or registered mode not honored')
+        if plan.get('response_lane',False):
+            cell=placed['cells'].get(response_transform['retained_lut'],{})
+            if (cell.get('attributes',{}).get('NEXTPNR_BEL')!=response_transform['required_bel'] or
+                    int(cell.get('parameters',{}).get('FF','0'),2)!=1 or
+                    cell.get('connections',{}).get('Q')!=placed['netnames']['u_user.r_lane']['bits']):
+                raise ValueError('Response-lane retained LUT/FF placement not honored')
     words=BitFile.load(image)
     if words.arch_version!=0xfe or len(words.words)!=962:raise ValueError('Wrong diagnostic image format')
     (out/case/'result.json').write_text(json.dumps(dict(case=case,run=os.environ.get('GITHUB_RUN_ID'),source_sha=os.environ.get('GITHUB_SHA'),
@@ -198,6 +216,7 @@ def run(out,case):
         known_lut_inputs=plan.get('known_lut_inputs',False) if case=='candidate' else False,input_transform=input_transform,min_ctrl=threshold,
         local_capture=plan.get('local_capture',False) if case=='candidate' else False,capture_transform=capture_transform,
         uart_buffer=plan.get('uart_buffer',False) if case=='candidate' else False,buffer_transform=buffer_transform,
+        response_lane=plan.get('response_lane',False) if case=='candidate' else False,response_transform=response_transform,
         actual_native_loading=False,timing_acceptance=False,physical_acceptance=False,adopted=False),indent=2)+'\n')
 
 
@@ -211,5 +230,6 @@ if __name__=='__main__':
     x.add_argument('--candidate-min-ctrl',type=int,choices=(4,16),default=4)
     x.add_argument('--local-capture',action='store_true')
     x.add_argument('--uart-buffer',action='store_true')
+    x.add_argument('--response-lane',action='store_true')
     x=sub.add_parser('run');x.add_argument('--out',type=Path,required=True);x.add_argument('--case',choices=('control','candidate'),required=True)
     a=vars(p.parse_args());mode=a.pop('mode');(prepare if mode=='prepare' else run)(**a)

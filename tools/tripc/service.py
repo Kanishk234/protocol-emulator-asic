@@ -1,8 +1,8 @@
-"""Conditional SRAM service envelope for straight-line, non-output routines.
+"""Conditional SRAM service envelope for acyclic, non-output routines.
 
 Decode the emitted words from the encoding specification. Do not infer timing
 from names, source text, or the compiler's max_steps metadata. This supplies no
-arrival bound and deliberately refuses branches, output waits and state writes.
+arrival bound and deliberately refuses loops, output waits and state writes.
 """
 import tripwire_spec as S
 
@@ -59,8 +59,17 @@ def routine_service(image, name, *, reflex_budget=0):
         else:
             sub = _field(word, S.ROUTINE_CTRL_SUB)
             kind, fields = next((k, f) for k, (v, f) in S.ROUTINE_CTRL.items() if v == sub)
-        if kind in ('BR', 'DJNZ', 'OUT'):
-            return refuse('Control flow and output waits need a separate progress contract')
+        if kind in ('DJNZ', 'OUT'):
+            return refuse('Loops and output waits need a separate progress contract')
+        if kind == 'BR':
+            hi, lo = fields['off']
+            offset = _field(word, (hi, lo))
+            sign = 1 << (hi - lo)
+            if offset & sign:
+                offset -= sign << 1
+            target = n + 1 + offset
+            if not n < target < count:
+                return refuse('Branch must target a later word inside the routine')
         if kind == 'SYS':
             if _field(word, fields['fn']) != S.SYS['RET'] or n != count - 1:
                 return refuse('Requires exactly one terminal RET and no other SYS operation')
@@ -68,6 +77,8 @@ def routine_service(image, name, *, reflex_budget=0):
             return refuse('Routine has no terminal RET')
         loads += kind == 'LD'
         stores += kind == 'ST'
+    # A forward branch can only skip words, so charging every word and data
+    # access in the routine bounds both paths.
     # Entry-table read, every instruction fetch, and each data read/write need
     # separate rotation slots (R1-R3). Without reflex interference, fetch ->
     # EVAL -> EXEC fits before the next slot. LD writeback also fits before it.

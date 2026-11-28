@@ -62,7 +62,7 @@ def tiny(body):
 
 @pytest.mark.parametrize('body', [
     '    out O0, r0\n    ret\n',
-    '    br end\n    end:\n    ret\n',
+    '    loop:\n    br loop\n    ret\n',
     '    load16 r0, 2\n    loop:\n    djnz r0, loop\n    ret\n',
     '    setst A\n    ret\n',
     '    nop\n    ret\n',
@@ -105,6 +105,27 @@ def test_unlimited_urgent_traffic_is_not_a_finite_service_guarantee():
 def test_unknown_routine_has_no_bound():
     image = tiny('    ret\n')
     assert routine_service(image, 'absent')['bound_clocks'] is None
+
+
+@pytest.mark.parametrize('phase', range(4))
+def test_forward_branch_service_bounds_both_paths(phase):
+    image = tiny('    add r0, r1, 0\n    br done if rz\n    ld r2, r3\n    done:\n    ret\n')
+    result = routine_service(image, 'worker')
+    assert result['status'] == 'conditional_bound'
+    elapsed = []
+    for value in (0, 1):
+        chip = Chip()
+        tripc.load(chip, image)
+        chip.lanes[0].regs[1] = value
+        chip.lanes[0].regs[3] = 500
+        chip.cycle = phase
+        chip.step()
+        assert chip.lanes[0].rb
+        while chip.lanes[0].rb and chip.cycle - phase <= result['bound_clocks']:
+            chip.step()
+        assert not chip.lanes[0].rb
+        elapsed.append(chip.cycle - phase)
+    assert elapsed[0] < elapsed[1] <= result['bound_clocks']
 
 
 def test_report_uses_access_envelope_not_old_step_only_estimate():

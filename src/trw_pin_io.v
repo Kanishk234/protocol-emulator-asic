@@ -38,7 +38,7 @@ module trw_pin_io (
     wire       c_on  = (pin_c < 5'd24);
 
     // A/B retain bounded indexing. C defaults mask any unattached index.
-    wire       a_pad = pads[a_on ? a_idx : 5'd0];
+    wire       a_pad_unmasked = pads[a_idx];
     wire       b_pad = pads[b_on ? pin_b : 5'd0];
     reg c_pad;
     integer c_pi;
@@ -48,7 +48,7 @@ module trw_pin_io (
             c_pad = c_pad | (pads[c_pi] && (pin_c == c_pi));
     end
 
-    assign a_in = a_on ? a_pad : idle;
+    assign a_in = a_on ? a_pad_unmasked : idle;
     assign b_in = b_on && b_pad;
     assign c_in = c_on ? c_pad : c_active;
     assign sel = !c_on || (c_pad == c_active);
